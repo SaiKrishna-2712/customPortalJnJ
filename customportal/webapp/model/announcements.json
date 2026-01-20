@@ -1,0 +1,28 @@
+{
+  "announcements": [
+    {
+      "title": "Final Data Hub Refresh 2024",
+      "date": "26 minutes ago",
+      "description": "the quantities, characters, or symbols on which operations are performed by a computer, which may be stored and transmitted ",
+      "tags": ["General", "Planning","Application","Planning/Forecasting"]
+    },
+    {
+      "title": "A2R Reporting",
+      "date": "2 hours ago",
+      "description": "There is a known issue that is actively being solutioned where the Free Cash Flow report is displaying the Accumulated Goodwill Impairment account incorrectly...",
+      "tags": ["Reporting"]
+    },
+    {
+      "title": "OPEX Commitment Data Issue",
+      "date": "2 days ago",
+      "description": "Lightning Data solutions easily integrate into Salesforce for an automatic connection to updated data that supercharges your sales and marketing efforts.",
+      "tags": ["Reporting"]
+    },
+    {
+      "title": "For Access Issues - Log Using",
+      "date": "May 21",
+      "description": "Lightning Data solutions easily integrate into Salesforce for an automatic connection to updated data that supercharges your sales and marketing efforts.",
+      "tags": ["Application"]
+    }
+  ]
+}

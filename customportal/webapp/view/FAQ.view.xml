@@ -1,0 +1,56 @@
+<mvc:View
+    controllerName="com.incture.customportal.controller.FAQ"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <!-- Floating FAQ Button -->
+    <Button
+        id="faqBtnUI5"
+        text="FAQ"
+        press=".onOpenFAQ"
+        type="Emphasized"
+        tooltip="FAQ"
+        class="faqFloatingBtnCss"
+    />
+
+    <!-- FAQ Responsive Popover -->
+    <ResponsivePopover
+        id="faqPopover"
+        title="Top FAQs"
+        placement="Top"
+        showHeader="true"
+        class="sapUiContentPadding"
+    >
+        <content>
+            <List items="{faqModel>/faqs}">
+                <CustomListItem>
+                    <VBox width="100%">
+                        <HBox
+                            alignItems="Center"
+                            justifyContent="SpaceBetween"
+                            width="100%"
+                        >
+                            <Text
+                                text="{faqModel>question}"
+                                wrapping="true"
+                            />
+                            <Button
+                                icon="{= ${faqModel>expanded} ? 'sap-icon://navigation-down-arrow' : 'sap-icon://navigation-right-arrow'}"
+                                type="Transparent"
+                                press=".onToggleFAQ"
+                            />
+                        </HBox>
+                        <!-- Answer shown only when expanded -->
+                        <Text
+                            text="{faqModel>answer}"
+                            visible="{faqModel>expanded}"
+                            wrapping="true"
+                            class="sapUiTinyMarginTop"
+                        />
+                    </VBox>
+                </CustomListItem>
+            </List>
+        </content>
+    </ResponsivePopover>
+</mvc:View>

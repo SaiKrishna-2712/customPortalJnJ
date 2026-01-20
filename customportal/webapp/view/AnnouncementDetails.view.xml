@@ -1,0 +1,310 @@
+<mvc:View
+    controllerName="com.incture.customportal.controller.AnnouncementDetails"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:l="sap.ui.layout"
+    xmlns="sap.m"
+    displayBlock="true"
+>
+    <Shell
+        id="idAnnouncementShell"
+        appWidthLimited="false"
+    >
+        <App id="idAnnouncementApp">
+            <Page
+                id="idAnnouncementPg"
+                showHeader="false"
+                class="greyBackgroundCss"
+            >
+                <content>
+                    <!-- Main container-->
+                    <VBox
+                        id="idAnnouncementMainVBox"
+                        width="100%"
+                        class="greyBackgroundCss"
+                    >
+                        <!-- Global Announcement Bar -->
+                        <Toolbar
+                            id="idAnnouncementGlobalTlbr"
+                            height="2.5rem"
+                            class="announcementBarCss"
+                        >
+                            <ToolbarSpacer />
+                            <Text
+                                id="idAnnouncementGlobalTxt"
+                                text="{i18n>globalAnnouncementText}"
+                                class="sapUiSmallMargin announcementTxtCss"
+                            />
+                            <ToolbarSpacer />
+                        </Toolbar>
+
+                        <!-- ShellBar -->
+                        <f:ShellBar
+                            id="idAnnouncementShellBar"
+                            title="{i18n>webPortalTitle}"
+                            homeIcon="./image/JJ_Logo_Stacked_Red_RGB.png"
+                            showNotifications="false"
+                            showProductSwitcher="false"
+                            class="shellBarCss"
+                            homeIconPressed=".onLogoPress"
+                        >
+                            <f:searchManager>
+                                <f:SearchManager
+                                    id="idAnnouncementSearchMgr"
+                                    placeholder="{i18n>searchPlaceholder}"
+                                    maxLength="80"
+                                    search="onShellSearch"
+                                />
+                            </f:searchManager>
+                            <f:profile>
+                                <f:Avatar
+                                    id="idAnnouncementUserAvtr"
+                                    initials="JD"
+                                    displaySize="XS"
+                                    backgroundColor="Accent1"
+                                    tooltip="{i18n>userProfileTooltip}"
+                                    press="onAvatarPress"
+                                />
+                            </f:profile>
+                        </f:ShellBar>
+
+                        <!-- Breadcrumb Navigation -->
+                        <VBox
+                            class="sapUiSmallMarginTop sapUiSmallMarginBegin sapUiSmallMarginEnd"
+                        >
+                            <Breadcrumbs>
+                                <Link
+                                    text="Home"
+                                    press=".onNavBack"
+                                />
+                                <Link text="Announcements" />
+                            </Breadcrumbs>
+                        </VBox>
+
+                        <!-- Page Title -->
+                        <VBox
+                            class="sapUiMediumMarginTop sapUiMediumMarginBegin sapUiMediumMarginEnd"
+                        >
+                            <Title
+                                text="Announcements"
+                                level="H1"
+                                class="sapUiMediumMarginBottom"
+                            />
+                        </VBox>
+
+                        <!-- Main Content Area -->
+                        <l:Grid
+                            id="idAnnouncementLayoutGrd"
+                            defaultSpan="L12 M12 S12"
+                            width="98%"
+                            hSpacing="1"
+                            vSpacing="1"
+                            class="sapUiContentPadding"
+                        >
+                            <!-- Left Section - Topics Filter (30%) -->
+                            <VBox width="100%">
+                                <layoutData>
+                                    <l:GridData span="L3 M12 S12" />
+                                </layoutData>
+
+                                <VBox
+                                    class="sapUiContentPadding"
+                                    backgroundDesign="Solid"
+                                >
+                                    <!-- Topics Header -->
+                                    <HBox
+                                        justifyContent="SpaceBetween"
+                                        alignItems="Center"
+                                        class="sapUiSmallMarginBottom"
+                                    >
+                                        <Title
+                                            text="Topics"
+                                            level="H3"
+                                            class="sectionTitleCss"
+                                        />
+                                        <Link
+                                            text="Reset"
+                                            press=".onResetFilters"
+                                        />
+                                    </HBox>
+
+                                    <!-- Topic Filters -->
+                                    <VBox class="sapUiSmallMarginTop">
+                                        <CheckBox
+                                            text="General"
+                                            selected="{filterModel>/general}"
+                                            select=".onTopicFilterChange"
+                                            class="sapUiSmallMarginBottom"
+                                        />
+                                        <CheckBox
+                                            text="Reporting"
+                                            selected="{filterModel>/reporting}"
+                                            select=".onTopicFilterChange"
+                                            class="sapUiSmallMarginBottom"
+                                        />
+                                        <CheckBox
+                                            text="Planning / Forecasting"
+                                            selected="{filterModel>/planning}"
+                                            select=".onTopicFilterChange"
+                                            class="sapUiSmallMarginBottom"
+                                        />
+                                        <CheckBox
+                                            text="A2R"
+                                            selected="{filterModel>/a2r}"
+                                            select=".onTopicFilterChange"
+                                            class="sapUiSmallMarginBottom"
+                                        />
+                                    </VBox>
+
+                                    <!-- Manage Topics Link -->
+                                    <Link
+                                        text="Manage My Topics"
+                                        press=".onManageTopics"
+                                        class="sapUiMediumMarginTop"
+                                    />
+                                </VBox>
+                            </VBox>
+
+                            <!-- Right Section - Announcements List (70%) -->
+                            <VBox width="100%">
+                                <layoutData>
+                                    <l:GridData span="L9 M12 S12" />
+                                </layoutData>
+
+                                <VBox
+                                    class="sapUiContentPadding"
+                                    backgroundDesign="Solid"
+                                >
+                                    <!-- Announcements List -->
+                                    <List
+                                        id="idAnnouncementDetailsList"
+                                        items="{announcementDetailsModel>/announcements}"
+                                        mode="None"
+                                        noDataText="No announcements available"
+                                    >
+                                        <CustomListItem
+                                            type="Active"
+                                            press=".onAnnouncementItemPress"
+                                        >
+                                            <HBox
+                                                width="100%"
+                                                class="sapUiSmallMargin sapUiSmallMarginBottom"
+                                                alignItems="Stretch"
+                                            >
+                                                <!-- Vertical line -->
+                                                <VBox
+                                                    class="lineContainer"
+                                                    width="auto"
+                                                    height="100%"
+                                                >
+                                                    <VBox
+                                                        class="lineBlue"
+                                                        height="100%"
+                                                    />
+                                                </VBox>
+                                                <!-- Content -->
+                                                <VBox
+                                                    width="100%"
+                                                    class="sapUiTinyMarginStart"
+                                                >
+                                                    <Text
+                                                        text="{announcementDetailsModel>title}"
+                                                        class="sapUiTinyMarginBottom announcementTextUnread"
+                                                    />
+                                                    <Text
+                                                        text="{announcementDetailsModel>date}"
+                                                        class="sapUiTinyMarginBottom announcementTextUnread"
+                                                    />
+                                                    <HBox
+                                                        wrap="Wrap"
+                                                        class="sapUiTinyMarginBottom"
+                                                        items="{announcementDetailsModel>tags}"
+                                                    >
+                                                        <items>
+                                                            <ObjectStatus
+                                                                text="{announcementDetailsModel>}"
+                                                                state="None"
+                                                                class="sapUiTinyMarginEnd announcementTagCss announcementTextUnread"
+                                                            />
+                                                        </items>
+                                                    </HBox>
+                                                    <Text
+                                                        text="{announcementDetailsModel>description}"
+                                                        visible="{announcementDetailsModel>expanded}"
+                                                        wrapping="true"
+                                                        class="announcementTextUnread"
+                                                    />
+                                                </VBox>
+                                            </HBox>
+                                        </CustomListItem>
+                                    </List>
+                                </VBox>
+                            </VBox>
+                        </l:Grid>
+                    </VBox>
+
+                    <!-- Footer -->
+                    <VBox
+                        class="sapUiContentPadding sapUiLargeMarginTop"
+                        backgroundDesign="Transparent"
+                    >
+                        <OverflowToolbar
+                            class="sapUiResponsiveContentPadding greyBackgroundCss"
+                        >
+                            <!-- Left side content - Company Logo and links -->
+                            <HBox
+                                alignItems="Center"
+                                wrap="Wrap"
+                                class="sapUiResponsiveMargin"
+                            >
+                                <Image
+                                    src="image/JJ_Logo_SingleLine_Red_RGB.png"
+                                    alt="JnJ Logo"
+                                    densityAware="false"
+                                    class="sapUiTinyMarginEnd"
+                                    width="130px"
+                                    height="25px"
+                                />
+
+                                <Link
+                                    text="{i18n>privacyPolicyText}"
+                                    press="onPrivacyPress"
+                                    class="footerLinkCss sapUiTinyMarginEnd"
+                                />
+                                <Text
+                                    text="|"
+                                    class="footerTextCss sapUiTinyMarginEnd"
+                                />
+
+                                <Link
+                                    text="{i18n>termsOfUseText}"
+                                    press="onTermsPress"
+                                    class="footerLinkCss sapUiTinyMarginEnd"
+                                />
+                                <Text
+                                    text="|"
+                                    class="footerTextCss sapUiTinyMarginEnd"
+                                />
+
+                                <Link
+                                    text="{i18n>releaseNotesText}"
+                                    press="onReleasePress"
+                                    class="footerLinkCss"
+                                />
+                            </HBox>
+
+                            <ToolbarSpacer />
+
+                            <Text
+                                text="{i18n>copyrightText}"
+                                class="footerTextCss sapUiResponsiveMargin"
+                                textAlign="End"
+                            />
+                        </OverflowToolbar>
+                    </VBox>
+                </content>
+            </Page>
+        </App>
+    </Shell>
+</mvc:View>

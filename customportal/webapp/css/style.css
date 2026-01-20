@@ -1,0 +1,256 @@
+/* Enter your custom styles here */
+/* Add to your existing CSS file */
+
+
+/* Global Announcement Bar Styles */
+.announcementBarCss {
+    background-color: #e74c3c !important;
+    /* Red alert-style */
+    font-weight: bold;
+    overflow: hidden;
+    /* Hide overflowing text */
+}
+
+.marquee-container {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.announcementTxtCss {
+    color: white !important;
+    font-size: 1rem;
+    white-space: nowrap;
+    /* Prevent text wrapping */
+}
+
+/* Marquee animation - starts from right, moves to left */
+.marquee-text {
+    display: inline-block;
+    animation: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+        /* Start from right edge */
+    }
+
+    100% {
+        transform: translateX(-100%);
+        /* End at left edge (completely off-screen) */
+    }
+}
+
+/* Pause animation on hover (optional) */
+.marquee-text:hover {
+    animation-play-state: paused;
+}
+
+.shellBarCss .sapFShellBarHomeIcon {
+    max-height: 5rem !important;
+    height: 3.5rem !important;
+}
+
+.userNameText {
+    font-size: 1.02rem;
+    /* biggest */
+    font-weight: bold;
+}
+
+.userEmailText {
+    font-size: 0.92rem;
+    /* smaller than name */
+    color: #555;
+    /* optional for better contrast */
+}
+
+.buildVersionText {
+    font-size: 0.75rem;
+    /* smallest */
+    color: #0070f2;
+    /* lighter look */
+}
+
+.greyBackgroundCss {
+    background-color: #e5e5e5;
+}
+
+.customTileGrid {
+    max-width: 80rem;
+    /* ~1280px → fits 4 tiles nicely */
+    margin: 0 auto;
+    /* centers the grid */
+}
+
+/* Capsule style for tags */
+.announcementTagCss {
+    background-color: #edeaea;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    color: #333333;
+    height: auto;
+    min-width: auto;
+    display: inline-block;
+    line-height: normal;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    /* Prevent vertical collapse if wrapping */
+    white-space: nowrap;
+    /* Prevent tags from breaking into multiple lines */
+}
+
+
+
+
+.sectionTitleCss {
+    font-size: 1.05rem !important;
+    font-weight: bold !important;
+}
+
+.viewsTextCss {
+    font-style: italic;
+}
+
+
+
+.rightBorderCss {
+    padding-right: 1rem !important;
+    border-right: 1px solid #898989 !important;
+}
+
+/* Banner container - consistent with cards */
+.bannerContainerCss {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-top: 1rem;
+}
+
+/* Banner background */
+.bannerFlexBoxCss {
+    background-image: url('../image/Weather_Banner.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 0.5rem;
+}
+
+/* Reduce bottom gap compared to content */
+.bannerFlexBoxCss.sapUiSmallMarginBottom {
+    margin-bottom: 0.5rem !important;
+}
+
+/* Text styling */
+.bannerDateTempCss {
+    font-weight: bold;
+    color: white;
+}
+
+.bannerGreetingCss {
+    color: white;
+}
+
+/* Floating circular FAQ button */
+.faqFloatingBtnCss {
+    position: absolute !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+    border-radius: 50% !important;
+    background-color: #e60000 !important;
+    border: none !important;
+    z-index: 9999999 !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: grab !important;
+    /* shows draggable */
+}
+
+body>#faqBtnUI5 {
+    position: absolute !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 999999 !important;
+}
+
+.faqFloatingBtnCss:active {
+    cursor: grabbing !important;
+}
+
+/* Override SAPUI5 button inner container */
+.faqFloatingBtnCss .sapMBtnInner {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* FAQ text styling */
+.faqFloatingBtnCss .sapMBtnText {
+    color: #ffffff !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    line-height: 1 !important;
+}
+
+
+/* Hover effect */
+.faqFloatingBtnCss:hover {
+    background-color: #cc0000 !important;
+    transform: scale(1.05) !important;
+    transition: all 0.2s ease !important;
+}
+
+
+.emergencyTitleBlue {
+    color: #0a6ed1 !important;
+    font-weight: bold;
+}
+
+/* Announcement blue line CSS */
+.lineBlue {
+  background-color: #0070f2 !important; /* Blue */
+  width: 4px !important;
+  min-width: 4px !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+.lineLightGray {
+  background-color: #9f9e9e !important; /* Light grey */
+  width: 4px !important;
+  min-width: 4px !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+/* Container for the line */
+.lineContainer {
+  width: 4px;
+  min-width: 4px;
+  height: inherit !important;
+  margin-right: 8px;
+  padding: 0;
+}
+
+.announcementTextUnread {
+  font-weight: normal !important;
+  color: black !important;
+}
+
+.announcementTextRead {
+  font-weight: normal !important;
+  color: #9f9e9e !important;
+}

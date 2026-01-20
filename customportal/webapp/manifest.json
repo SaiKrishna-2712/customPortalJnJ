@@ -1,0 +1,135 @@
+{
+  "_version": "1.76.0",
+  "sap.app": {
+    "id": "com.incture.customportal",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.19.1",
+      "toolsId": "d42aac77-6cfe-4b08-8202-815e4cf5878f"
+    },
+    "dataSources": {
+      "announcementService": {
+        "uri": "/JnJ_Workzone_Portal_Destination_Node/odata/v2/announcement",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "quickLinksService": {
+        "uri": "/JnJ_Workzone_Portal_Destination_Node/odata/v4/QuickLinkService",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.141.1",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.f": {},
+        "sap.ui.layout": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "com.incture.customportal.i18n.i18n"
+        }
+      },
+      "announcementModel": {
+        "dataSource": "announcementService",
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "preload": true
+      },
+      "quickLinkModel": {
+        "dataSource": "quickLinksService",
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "preload": true
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "idMainApp",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "com.incture.customportal.view",
+        "async": true,
+        "viewPath": "com.incture.customportal.view"
+      },
+      "routes": [
+        {
+          "name": "RouteApp",
+          "pattern": ":?query:",
+          "target": [
+            "TargetApp"
+          ]
+        },
+        {
+          "name": "RouteAnnouncementDetails",
+          "pattern": "announcements",
+          "target": [
+            "TargetAnnouncementDetails"
+          ]
+        }
+      ],
+      "targets": {
+        "TargetApp": {
+          "name": "App"
+        },
+        "TargetAnnouncementDetails": {
+          "name": "AnnouncementDetails"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "com.incture.customportal.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  }
+}

@@ -1,0 +1,47 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Popover
+        id="userProfilePopover"
+        placement="Bottom"
+        showHeader="false"
+    >
+        <content>
+            <VBox>
+                <!-- Name and Email -->
+                <VBox
+                    class="sapUiNoMargin sapUiContentPadding sapUiNoMarginBegin"
+                >
+                    <Text
+                        text="{userModel>/fullName}"
+                        class="userNameText"
+                    />
+                    <Text
+                        text="{userModel>/email}"
+                        class="userEmailText"
+                    />
+                </VBox>
+
+                <!-- Horizontal separator line -->
+                <core:HTML
+                    content="&lt;hr style='border: none; border-top: 1px solid #d9d9d9; margin: 4px 0; width: 100%;' /&gt;"
+                />
+
+                <!-- Build version -->
+                <HBox
+                    width="100%"
+                    justifyContent="Center"
+                    alignItems="Center"
+                    class="sapUiTinyMarginBottom"
+                >
+                    <Text
+                        text="Build Version: 1.0.3"
+                        class="buildVersionText"
+                        textAlign="Center"
+                    />
+                </HBox>
+            </VBox>
+        </content>
+    </Popover>
+</core:FragmentDefinition>
