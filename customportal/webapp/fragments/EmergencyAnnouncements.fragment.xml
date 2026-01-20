@@ -5,7 +5,7 @@
     <Dialog
         id="idEmergencyAnnouncementDialog"
         showHeader="false"
-        title="Emergency Announcements"
+        title="{i18n>emergencyAnnouncementsTitle}"
         contentWidth="40rem"
         resizable="false"
         draggable="false"

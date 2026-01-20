@@ -496,7 +496,7 @@ sap.ui.define([
 
             let aAnnouncements = allAnnouncements.filter(item =>
                 item.isActive !== false &&
-                this._hasAnnouncementType(item.announcementType, "Emergency")
+                this._hasAnnouncementType(item.announcementType, "Important Announcement")
             );
 
             if (aAnnouncements.length === 0) return;
