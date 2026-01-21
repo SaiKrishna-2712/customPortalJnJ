@@ -51,8 +51,8 @@ sap.ui.define([
             });
             this.getView().setModel(oAnnouncementDetailsModel, "announcementDetailsModel");
 
-            // Load announcements
-            this._loadAnnouncements();
+            // Load announcements using OData V2
+            this._loadAnnouncementsODataV2();
 
             // Fetch current user and update avatar
             this.getCurrentUserDetails().then((oUser) => {
@@ -75,95 +75,144 @@ sap.ui.define([
             });
         },
 
-        _loadAnnouncements: function () {
-            var oModel = this.getView().getModel("announcementDetailsModel");
+        /**
+         * Load announcements using OData V2 (same approach as App.controller.js)
+         */
+        _loadAnnouncementsODataV2: function () {
+            var that = this;
+            var oAnnouncementDetailsModel = this.getView().getModel("announcementDetailsModel");
 
-            var sAnnouncementsUrl =
-                "/JnJ_Workzone_Portal_Destination_Java/odata/v4/AnnouncementService/Announcements?$expand=toTypes($expand=type)";
+            // Get the OData V2 model from manifest
+            var oDataModel = this.getOwnerComponent().getModel("announcementModel");
 
-            oModel.loadData(
-                sAnnouncementsUrl,
-                null,
-                true,
-                "GET",
-                false,
-                false,
-                { "Content-Type": "application/json" }
-            );
+            if (!oDataModel) {
+                console.error("announcementModel not found in manifest");
+                oAnnouncementDetailsModel.setProperty("/announcements", []);
+                return;
+            }
 
-            oModel.attachRequestCompleted(function (oEvent) {
-                const oData = oEvent.getSource().getData();
-                let aAnnouncements = oData.value || oData || [];
+            // Read announcements with expand (OData V2 syntax)
+            oDataModel.read("/Announcements", {
+                urlParameters: {
+                    "$expand": "toTypes/type"
+                },
+                success: function (oData) {
+                    var allAnnouncements = oData.results || [];
 
-                // Format date
-                const formatDate = function (dateString) {
-                    if (!dateString) return "";
-                    const d = new Date(dateString);
-                    return d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+                    // Transform the OData response to match expected format
+                    allAnnouncements = allAnnouncements.map(function (item) {
+                        return {
+                            announcementId: item.announcementId,
+                            title: item.title,
+                            description: item.description,
+                            announcementType: item.announcementType,
+                            isRead: item.isRead,
+                            isActive: item.isActive,
+                            startAnnouncement: item.startAnnouncement,
+                            endAnnouncement: item.endAnnouncement,
+                            publishedBy: item.publishedBy,
+                            publishedAt: item.publishedAt,
+                            announcementStatus: item.announcementStatus,
+                            toTypes: item.toTypes ? item.toTypes.results || item.toTypes : []
+                        };
+                    });
+
+                    // Process announcements
+                    that._processProcessAnnouncements(allAnnouncements, oAnnouncementDetailsModel);
+                },
+                error: function (oError) {
+                    console.error("Failed to load announcements from OData V2 API", oError);
+                    oAnnouncementDetailsModel.setProperty("/announcements", []);
+                }
+            });
+        },
+
+        /**
+         * Process PROCESS type announcements (from App.controller.js)
+         */
+        _processProcessAnnouncements: function (allAnnouncements, oModel) {
+            const getRelativeTime = function (dateString) {
+                if (!dateString) return "";
+                // Handle OData date format /Date(timestamp)/ or /Date(timestamp+offset)/
+                var timestamp = dateString;
+                if (typeof dateString === "string" && dateString.indexOf("/Date(") === 0) {
+                    var matches = dateString.match(/\/Date\((\d+)(?:[+-]\d+)?\)\//);
+                    if (matches && matches[1]) {
+                        timestamp = parseInt(matches[1]);
+                    }
+                }
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diffMs = now - date;
+                const sec = Math.floor(diffMs / 1000);
+                const min = Math.floor(sec / 60);
+                const hr = Math.floor(min / 60);
+                const day = Math.floor(hr / 24);
+
+                if (sec < 60) return sec + " second" + (sec !== 1 ? "s" : "") + " ago";
+                if (min < 60) return min + " minute" + (min !== 1 ? "s" : "") + " ago";
+                if (hr < 24) return hr + " hour" + (hr !== 1 ? "s" : "") + " ago";
+                return day + " day" + (day !== 1 ? "s" : "") + " ago";
+            };
+
+            const hasProcessType = function (announcementType) {
+                if (!announcementType) return false;
+                return announcementType.split(",").map(t => t.trim()).includes("Process");
+            };
+
+            let aAnnouncements = allAnnouncements.filter(item => item.isActive === true && hasProcessType(item.announcementType) && item.announcementStatus === "PUBLISHED");
+
+
+            aAnnouncements = aAnnouncements.map(item => {
+                const tags = (item.toTypes || [])
+                    .map(typeObj => typeObj.type?.name || "")
+                    .filter(name => name !== "");
+
+                return {
+                    id: item.announcementId,
+                    title: item.title || "No Title",
+                    description: item.description || "",
+                    date: getRelativeTime(item.startAnnouncement),
+                    tags: tags,
+                    announcementType: item.announcementType || "",
+                    read: item.isRead || false,
+                    expanded: false,
+                    previousExpanded: false,
+                    startDate: item.startAnnouncement,
+                    endDate: item.endAnnouncement,
+                    isActive: item.isActive
                 };
+            });
 
-                // Check if announcementType contains "Process"
-                const hasProcessType = function (announcementType) {
-                    if (!announcementType) return false;
-                    return announcementType
-                        .split(",")
-                        .map(t => t.trim())
-                        .includes("Process");
-                };
+            // Sort by start date (newest first)
+            aAnnouncements.sort((a, b) => {
+                var dateA = this._parseODataDate(a.startDate);
+                var dateB = this._parseODataDate(b.startDate);
+                return dateB - dateA;
+            });
 
-                // ---------------------------------------------------------
-                // FILTER 1: Active announcements
-                // ---------------------------------------------------------
-                aAnnouncements = aAnnouncements.filter(item => item.isActive === true);
+            oModel.setProperty("/announcements", aAnnouncements);
 
-                // ---------------------------------------------------------
-                // FILTER 2: Process type announcements only
-                // ---------------------------------------------------------
-                aAnnouncements = aAnnouncements.filter(item => hasProcessType(item.announcementType));
+            setTimeout(() => {
+                this._updateAnnouncementStyles();
+            }, 100);
 
-                // ---------------------------------------------------------
-                // TRANSFORM DATA
-                // ---------------------------------------------------------
-                aAnnouncements = aAnnouncements.map(item => {
-                    const tags = (item.toTypes || [])
-                        .map(t => t.type?.name || "")
-                        .filter(n => n !== "");
+            console.log("Loaded " + aAnnouncements.length + " active Process announcements");
+        },
 
-                    return {
-                        id: item.announcementId,
-                        title: item.title || "No Title",
-                        description: item.description || "",
-                        date: formatDate(item.startAnnouncement),
-                        tags: tags,
-                        announcementType: item.announcementType || "",
-                        read: item.isRead || false,
-                        expanded: false,
-                        previousExpanded: false,
-                        startDate: item.startAnnouncement,
-                        endDate: item.endAnnouncement,
-                        isActive: item.isActive
-                    };
-                });
+        /**
+         * Helper: Parse OData date format
+         */
+        _parseODataDate: function (dateString) {
+            if (!dateString) return new Date(0);
 
-                // Sort: newest first
-                aAnnouncements.sort((a, b) => {
-                    return new Date(b.startDate) - new Date(a.startDate);
-                });
-
-                oModel.setProperty("/announcements", aAnnouncements);
-
-                setTimeout(() => {
-                    this._updateAnnouncementStyles();
-                }, 100);
-
-                console.log("Loaded " + aAnnouncements.length + " active Process announcements");
-
-            }.bind(this));
-
-            oModel.attachRequestFailed(function () {
-                console.error("Failed to load announcements from API");
-                oModel.setProperty("/announcements", []);
-            }.bind(this));
+            if (typeof dateString === "string" && dateString.indexOf("/Date(") === 0) {
+                var matches = dateString.match(/\/Date\((\d+)(?:[+-]\d+)?\)\//);
+                if (matches && matches[1]) {
+                    return new Date(parseInt(matches[1]));
+                }
+            }
+            return new Date(dateString);
         },
 
         onTopicFilterChange: function () {

@@ -396,8 +396,11 @@ sap.ui.define([
                 return announcementType.split(",").map(t => t.trim()).includes("Process");
             };
 
+            // UPDATED: Add status filter for PUBLISHED
             let aAnnouncements = allAnnouncements.filter(item =>
-                item.isActive === true && hasProcessType(item.announcementType)
+                item.isActive === true && 
+                hasProcessType(item.announcementType) &&
+                item.announcementStatus === "PUBLISHED"
             );
 
             aAnnouncements = aAnnouncements.map(item => {
@@ -409,6 +412,7 @@ sap.ui.define([
                     id: item.announcementId,
                     title: item.title || "No Title",
                     description: item.description || "",
+                    htmlDescription: item.description || "", // UPDATED: Store original HTML
                     date: getRelativeTime(item.startAnnouncement),
                     tags: tags,
                     announcementType: item.announcementType || "",
@@ -441,10 +445,12 @@ sap.ui.define([
          * Process GLOBAL type announcements
          */
         _processGlobalAnnouncements: function (allAnnouncements, oModel) {
+            // UPDATED: Add status filter for PUBLISHED
             let aAnnouncements = allAnnouncements.filter(item => {
                 return item.isActive !== false &&
                     !this._isExpired(item.endAnnouncement) &&
-                    this._hasAnnouncementType(item.announcementType, "Global");
+                    this._hasAnnouncementType(item.announcementType, "Planned Scheduled") &&
+                    item.announcementStatus === "PUBLISHED";
             });
 
             if (aAnnouncements.length > 0) {
@@ -470,8 +476,8 @@ sap.ui.define([
         },
 
         /**
-         * Process EMERGENCY type announcements
-         */
+        * Process EMERGENCY type announcements
+        */
         _processEmergencyAnnouncements: function (allAnnouncements) {
             const timeAgo = function (dateString) {
                 var timestamp = dateString;
@@ -494,9 +500,11 @@ sap.ui.define([
                 return days + " day" + (days === 1 ? "" : "s") + " ago";
             };
 
+            // UPDATED: Add status filter for PUBLISHED
             let aAnnouncements = allAnnouncements.filter(item =>
                 item.isActive !== false &&
-                this._hasAnnouncementType(item.announcementType, "Important Announcement")
+                this._hasAnnouncementType(item.announcementType, "Important Announcement") &&
+                item.announcementStatus === "PUBLISHED"
             );
 
             if (aAnnouncements.length === 0) return;
