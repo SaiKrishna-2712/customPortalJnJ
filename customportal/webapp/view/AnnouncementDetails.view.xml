@@ -229,6 +229,11 @@
                                                             />
                                                         </items>
                                                     </HBox>
+                                                    <Link
+                                                        text="{= ${announcementsModel>expanded} ? 'Read less' : 'Read more' }"
+                                                        press=".onAnnouncementItemPress"
+                                                        class="sapUiTinyMarginBottom"
+                                                    />
                                                     <Text
                                                         text="{announcementDetailsModel>description}"
                                                         visible="{announcementDetailsModel>expanded}"

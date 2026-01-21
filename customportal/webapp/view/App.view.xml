@@ -355,7 +355,6 @@
                                             >
                                                 <CustomListItem
                                                     type="Active"
-                                                    press=".onAnnouncementPress"
                                                 >
                                                     <HBox
                                                         width="100%"
@@ -399,6 +398,11 @@
                                                                     />
                                                                 </items>
                                                             </HBox>
+                                                            <Link
+                                                                text="{= ${announcementsModel>expanded} ? 'Read less' : 'Read more' }"
+                                                                press=".onAnnouncementPress"
+                                                                class="sapUiTinyMarginBottom"
+                                                            />
                                                             <Text
                                                                 text="{announcementsModel>description}"
                                                                 visible="{announcementsModel>expanded}"
