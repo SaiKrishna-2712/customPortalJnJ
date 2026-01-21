@@ -254,3 +254,52 @@ body>#faqBtnUI5 {
   font-weight: normal !important;
   color: #9f9e9e !important;
 }
+
+/* Remove all rounded corners for Emergency Announcement Dialog */
+[id$="idEmergencyAnnouncementDialog"],
+[id$="idEmergencyAnnouncementDialog"] .sapMDialog,
+[id$="idEmergencyAnnouncementDialog"] .sapMDialogSection,
+[id$="idEmergencyAnnouncementDialog"] .sapMDialogContent,
+[id$="idEmergencyAnnouncementDialog"] footer .sapMFooter-CTX {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Main content container */
+.emergencyDialogContainer {
+  padding: 1.25rem;
+  border: 0px;
+  background-color: #ffffff;
+}
+
+/* Header */
+.emergencyHeader {
+  margin-bottom: 0.5rem;
+}
+
+/* Title (blue, bold) */
+.emergencyTitle {
+  color: #1a33ff;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Time text */
+.emergencyTime {
+  color: #4d4d4d;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Description */
+.emergencyDescription {
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Read more link */
+.emergencyReadMore {
+  color: #d00000;
+  font-weight: 500;
+}

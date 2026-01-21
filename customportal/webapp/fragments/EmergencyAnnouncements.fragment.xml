@@ -5,81 +5,56 @@
     <Dialog
         id="idEmergencyAnnouncementDialog"
         showHeader="false"
-        title="{i18n>emergencyAnnouncementsTitle}"
-        contentWidth="40rem"
+        contentWidth="48rem"
         resizable="false"
         draggable="false"
         afterClose="onAfterCloseEmergencyDialog"
     >
         <content>
+            <VBox class="emergencyDialogContainer">
 
-            <ScrollContainer
-                height="400px"
-                width="100%"
-                vertical="true"
-                horizontal="false"
-            >
-                <List
-                    id="idEmergencyList"
-                    items="{emergencyModel>/announcements}"
-                    noDataText="No emergency announcements"
+                <!-- Header row: Title + Close -->
+                <HBox
+                    justifyContent="SpaceBetween"
+                    alignItems="Start"
+                    class="emergencyHeader"
                 >
-                    <CustomListItem type="Inactive">
-                        <HBox
-                            width="100%"
-                            alignItems="Start"
-                        >
-                            <!-- Blue line -->
-                            <VBox
-                                width="0.5rem"
-                                class="sapUiTinyMarginEnd"
-                            >
-                                <VBox
-                                    class="lineBlue"
-                                    height="100%"
-                                    width="4px"
-                                />
-                            </VBox>
+                    <Text
+                        text="{emergencyModel>/announcements/0/title}"
+                        class="emergencyTitle"
+                        wrapping="true"
+                    />
 
-                            <!-- Main section -->
-                            <VBox
-                                width="100%"
-                                class="sapUiTinyMarginBottom"
-                            >
-                                <VBox width="100%">
-                                    <!-- Title BLUE -->
-                                    <Text
-                                        text="{emergencyModel>title}"
-                                        class="sapUiSmallMarginBottom emergencyTitleBlue"
-                                    />
+                    <Button
+                        icon="sap-icon://decline"
+                        type="Transparent"
+                        press="onDismissAllEmergencyAnnouncements"
+                    />
+                </HBox>
+                <!-- Time -->
+                <Text
+                    text="{emergencyModel>/announcements/0/timeAgo}"
+                    class="emergencyTime"
+                />
 
-                                    <!-- Time -->
-                                    <Text
-                                        text="{emergencyModel>timeAgo}"
-                                        class="sapUiTinyMarginBottom"
-                                    />
-                                </VBox>
+                <!-- Description -->
+                <Text
+                    text="{emergencyModel>/announcements/0/description}"
+                    wrapping="true"
+                    class="emergencyDescription"
+                />
 
-                                <!-- Description -->
-                                <Text
-                                    text="{emergencyModel>description}"
-                                    wrapping="true"
-                                    class="sapUiSmallMarginTop"
-                                />
-                            </VBox>
-                        </HBox>
-                    </CustomListItem>
-                </List>
-            </ScrollContainer>
+                <!-- Read more -->
+                <HBox class="sapUiSmallMarginTop">
+                    <Text text="Read more:" class="sapUiTinyMarginEnd" />
+                    <Link
+                        text="{emergencyModel>/announcements/0/link}"
+                        href="{emergencyModel>/announcements/0/link}"
+                        target="_blank"
+                        class="emergencyReadMore"
+                    />
+                </HBox>
+            </VBox>
         </content>
-
-        <!-- Footer with Close Button aligned to right -->
-        <endButton>
-            <Button
-                text="Close"
-                type="Emphasized"
-                press="onDismissAllEmergencyAnnouncements"
-            />
-        </endButton> 
     </Dialog>
 </core:FragmentDefinition>
