@@ -230,14 +230,13 @@
                                                         </items>
                                                     </HBox>
                                                     <Link
-                                                        text="{= ${announcementsModel>expanded} ? 'Read less' : 'Read more' }"
+                                                        text="{= ${announcementDetailsModel>expanded} ? 'Read less' : 'Read more' }"
                                                         press=".onAnnouncementItemPress"
                                                         class="sapUiTinyMarginBottom"
                                                     />
-                                                    <Text
-                                                        text="{announcementDetailsModel>description}"
+                                                    <FormattedText
+                                                        htmlText="{announcementDetailsModel>description}"
                                                         visible="{announcementDetailsModel>expanded}"
-                                                        wrapping="true"
                                                         class="announcementTextUnread"
                                                     />
                                                 </VBox>

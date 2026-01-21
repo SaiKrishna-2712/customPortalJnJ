@@ -131,6 +131,7 @@ sap.ui.define([
          * Process PROCESS type announcements (from App.controller.js)
          */
         _processProcessAnnouncements: function (allAnnouncements, oModel) {
+            var that = this;
             const getRelativeTime = function (dateString) {
                 if (!dateString) return "";
                 // Handle OData date format /Date(timestamp)/ or /Date(timestamp+offset)/
@@ -171,7 +172,7 @@ sap.ui.define([
                 return {
                     id: item.announcementId,
                     title: item.title || "No Title",
-                    description: item.description || "",
+                    description: that._parseRichText(item.description),
                     date: getRelativeTime(item.startAnnouncement),
                     tags: tags,
                     announcementType: item.announcementType || "",
@@ -401,6 +402,20 @@ sap.ui.define([
 
         onReleasePress: function () {
             MessageToast.show("Release Notes");
+        },
+
+        _parseRichText: function (sHtml) {
+            if (!sHtml) {
+                return "";
+            }
+
+            const oParser = new DOMParser();
+            const oDoc = oParser.parseFromString(sHtml, "text/html");
+
+            // Optional cleanup
+            oDoc.querySelectorAll("script, style").forEach(el => el.remove());
+
+            return oDoc.body.innerHTML;
         }
 
     });

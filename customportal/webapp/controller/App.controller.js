@@ -367,6 +367,7 @@ sap.ui.define([
          * Process PROCESS type announcements
          */
         _processProcessAnnouncements: function (allAnnouncements, oModel) {
+            var that = this;
             const getRelativeTime = function (dateString) {
                 if (!dateString) return "";
                 // Handle OData date format /Date(timestamp)/ or /Date(timestamp+offset)/
@@ -412,7 +413,7 @@ sap.ui.define([
                     id: item.announcementId,
                     title: item.title || "No Title",
                     description: item.description || "",
-                    htmlDescription: item.description || "", // UPDATED: Store original HTML
+                    htmlDescription: that._parseRichText(item.description), // UPDATED: Store original HTML
                     date: getRelativeTime(item.startAnnouncement),
                     tags: tags,
                     announcementType: item.announcementType || "",
@@ -1301,8 +1302,21 @@ sap.ui.define([
             tempJsonModel.attachRequestFailed(function (oEvent) {
                 rError(oEvent);
             }.bind(rError));
-        }
+        },
 
+        _parseRichText: function (sHtml) {
+            if (!sHtml) {
+                return "";
+            }
+
+            const oParser = new DOMParser();
+            const oDoc = oParser.parseFromString(sHtml, "text/html");
+
+            // Optional cleanup
+            oDoc.querySelectorAll("script, style").forEach(el => el.remove());
+
+            return oDoc.body.innerHTML;
+        }
 
     });
 })

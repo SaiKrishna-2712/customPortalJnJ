@@ -403,10 +403,9 @@
                                                                 press=".onAnnouncementPress"
                                                                 class="sapUiTinyMarginBottom"
                                                             />
-                                                            <Text
-                                                                text="{announcementsModel>description}"
+                                                            <FormattedText
+                                                                htmlText="{announcementsModel>description}"
                                                                 visible="{announcementsModel>expanded}"
-                                                                wrapping="true"
                                                                 class="announcementTextUnread"
                                                             />
                                                         </VBox>
