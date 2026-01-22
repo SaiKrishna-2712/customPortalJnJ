@@ -651,8 +651,8 @@ sap.ui.define([
         },
 
         /**
- * Helper: Check if announcement is expired
- */
+         * Helper: Check if announcement is expired
+         */
         _isExpired: function (endDateString) {
             if (!endDateString) return false;
             var timestamp = endDateString;

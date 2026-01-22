@@ -82,6 +82,10 @@ sap.ui.define([
             var that = this;
             var oAnnouncementDetailsModel = this.getView().getModel("announcementDetailsModel");
 
+            var oGlobalAnnouncementDetailModel = new JSONModel();
+            this.getView().setModel(oGlobalAnnouncementDetailModel, "globalAnnouncementDetailModel");
+
+
             // Get the OData V2 model from manifest
             var oDataModel = this.getOwnerComponent().getModel("announcementModel");
 
@@ -119,6 +123,7 @@ sap.ui.define([
 
                     // Process announcements
                     that._processProcessAnnouncements(allAnnouncements, oAnnouncementDetailsModel);
+                    that._processGlobalAnnouncements(allAnnouncements, oGlobalAnnouncementDetailModel);
                 },
                 error: function (oError) {
                     console.error("Failed to load announcements from OData V2 API", oError);
@@ -200,6 +205,118 @@ sap.ui.define([
 
             console.log("Loaded " + aAnnouncements.length + " active Process announcements");
         },
+
+        _processGlobalAnnouncements: function (allAnnouncements, oModel) {
+            // UPDATED: Add status filter for PUBLISHED
+            let aAnnouncements = allAnnouncements.filter(item => {
+                return item.isActive !== false &&
+                    !this._isExpired(item.endAnnouncement) &&
+                    this._hasAnnouncementType(item.announcementType, "Planned Scheduled") &&
+                    item.announcementStatus === "PUBLISHED";
+            });
+
+            if (aAnnouncements.length > 0) {
+                aAnnouncements.sort((a, b) => {
+                    var dateA = this._parseODataDate(a.startAnnouncement);
+                    var dateB = this._parseODataDate(b.startAnnouncement);
+                    return dateB - dateA;
+                });
+
+                oModel.setProperty("/announcements", aAnnouncements);
+                oModel.setProperty("/currentIndex", 0);
+                oModel.setProperty("/totalCount", aAnnouncements.length);
+
+                this._updateGlobalAnnouncementText();
+
+                if (aAnnouncements.length > 1) {
+                    this._startGlobalAnnouncementRotation();
+                }
+            } else {
+                const oToolbar = this.byId("idGlobalAnnouncementDetailTlbr");
+                if (oToolbar) oToolbar.setVisible(false);
+            }
+        },
+
+        _updateGlobalAnnouncementText: function () {
+            const oModel = this.getView().getModel("globalAnnouncementDetailModel");
+            const aAnnouncements = oModel.getProperty("/announcements");
+            const iCurrentIndex = oModel.getProperty("/currentIndex");
+
+            if (!aAnnouncements || aAnnouncements.length === 0) return;
+
+            const oCurrentAnnouncement = aAnnouncements[iCurrentIndex];
+            const oText = this.byId("idGlobalAnnouncementDetailTxt");
+
+            if (oText && oCurrentAnnouncement) {
+                // Remove and re-add the marquee class to restart animation
+                const oDomRef = oText.getDomRef();
+                if (oDomRef) {
+                    oDomRef.style.animation = 'none';
+                    setTimeout(() => {
+                        oDomRef.style.animation = '';
+                    }, 10);
+                }
+
+                // Set the new text
+                oText.setText(oCurrentAnnouncement.title);
+            }
+        },
+
+        /**
+         * Start automatic rotation of global announcements
+         */
+        _startGlobalAnnouncementRotation: function () {
+            // Clear any existing interval
+            if (this._globalAnnouncementInterval) {
+                clearInterval(this._globalAnnouncementInterval);
+            }
+
+            // Rotate every 8 seconds (adjust as needed)
+            this._globalAnnouncementInterval = setInterval(function () {
+                const oModel = this.getView().getModel("globalAnnouncementDetailModel");
+                const iTotalCount = oModel.getProperty("/totalCount");
+                let iCurrentIndex = oModel.getProperty("/currentIndex");
+
+                // Move to next announcement (loop back to 0 after last)
+                iCurrentIndex = (iCurrentIndex + 1) % iTotalCount;
+                oModel.setProperty("/currentIndex", iCurrentIndex);
+
+                // Update display
+                this._updateGlobalAnnouncementText();
+            }.bind(this), 8000); // 8 seconds delay
+        },
+
+        /**
+         * Stop the global announcement rotation (call on exit/destroy)
+         */
+        _stopGlobalAnnouncementRotation: function () {
+            if (this._globalAnnouncementInterval) {
+                clearInterval(this._globalAnnouncementInterval);
+                this._globalAnnouncementInterval = null;
+            }
+        },
+
+        /**
+         * Helper: Check if announcement is expired
+         */
+        _isExpired: function (endDateString) {
+            if (!endDateString) return false;
+            var timestamp = endDateString;
+            if (typeof endDateString === "string" && endDateString.indexOf("/Date(") === 0) {
+                timestamp = parseInt(endDateString.replace("/Date(", "").replace(")/", ""));
+            }
+            const endDate = new Date(timestamp);
+            const now = new Date();
+            return now > endDate;
+        },
+
+        _hasAnnouncementType: function (announcementType, typeToCheck) {
+            if (!announcementType) return false;
+            const types = announcementType.split(',').map(type => type.trim());
+            return types.includes(typeToCheck);
+        },
+
+
 
         /**
          * Helper: Parse OData date format
