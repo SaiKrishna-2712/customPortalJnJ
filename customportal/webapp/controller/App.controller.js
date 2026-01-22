@@ -480,6 +480,7 @@ sap.ui.define([
         * Process EMERGENCY type announcements
         */
         _processEmergencyAnnouncements: function (allAnnouncements) {
+            var that = this;
             const timeAgo = function (dateString) {
                 var timestamp = dateString;
                 if (typeof dateString === "string" && dateString.indexOf("/Date(") === 0) {
@@ -513,7 +514,7 @@ sap.ui.define([
             const transformed = aAnnouncements.map(item => ({
                 id: item.announcementId,
                 title: item.title,
-                description: item.description,
+                description: that._parseRichText(item.description),
                 timeAgo: timeAgo(item.startAnnouncement)
             }));
 
@@ -619,7 +620,7 @@ sap.ui.define([
         onDismissAllEmergencyAnnouncements: function () {
             if (this._oEmergencyDialog) {
                 this._oEmergencyDialog.close();
-                MessageToast.show("All emergency announcements dismissed");
+                MessageToast.show("All Important Announcements dismissed");
             }
         },
 

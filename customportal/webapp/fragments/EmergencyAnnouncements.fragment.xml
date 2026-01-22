@@ -38,14 +38,13 @@
                 />
 
                 <!-- Description -->
-                <Text
-                    text="{emergencyModel>/announcements/0/description}"
-                    wrapping="true"
+                <FormattedText
+                    htmlText="{emergencyModel>/announcements/0/description}"
                     class="emergencyDescription"
                 />
 
                 <!-- Read more -->
-                <HBox class="sapUiSmallMarginTop">
+                <!-- <HBox class="sapUiSmallMarginTop">
                     <Text text="Read more:" class="sapUiTinyMarginEnd" />
                     <Link
                         text="{emergencyModel>/announcements/0/link}"
@@ -53,7 +52,7 @@
                         target="_blank"
                         class="emergencyReadMore"
                     />
-                </HBox>
+                </HBox> -->
             </VBox>
         </content>
     </Dialog>
