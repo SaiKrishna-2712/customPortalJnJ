@@ -518,7 +518,12 @@ sap.ui.define([
                 timeAgo: timeAgo(item.startAnnouncement)
             }));
 
-            this._showEmergencyDialog(transformed);
+            var oComponent = this.getOwnerComponent();
+            // Execute ONLY for Home route and ONLY once
+            if(oComponent._bHomeInitialized !== true) {
+                oComponent._bHomeInitialized = true;
+                this._showEmergencyDialog(transformed);
+            }
         },
 
         /**

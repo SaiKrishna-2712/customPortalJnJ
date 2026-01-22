@@ -21,6 +21,7 @@ sap.ui.define([
 
             // enable routing
             this.getRouter().initialize();
+            this._bHomeInitialized = false;
         }
     });
 });
