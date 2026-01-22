@@ -355,6 +355,7 @@
                                             >
                                                 <CustomListItem
                                                     type="Active"
+                                                    press=".onAnnouncementPress"
                                                 >
                                                     <HBox
                                                         width="100%"
@@ -375,6 +376,7 @@
                                                         <!-- Content -->
                                                         <VBox
                                                             width="100%"
+                                                            renderType="Bare"
                                                             class="sapUiTinyMarginStart"
                                                         >
                                                             <Text
@@ -398,11 +400,16 @@
                                                                     />
                                                                 </items>
                                                             </HBox>
-                                                            <Link
-                                                                text="{= ${announcementsModel>expanded} ? 'Read less' : 'Read more' }"
-                                                                press=".onAnnouncementPress"
-                                                                class="sapUiTinyMarginBottom"
-                                                            />
+                                                            <HBox
+                                                                width="100%"
+                                                                justifyContent="End"
+                                                            >
+                                                                <Link
+                                                                    text="{= ${announcementsModel>expanded} ? 'Read less' : 'Read more' }"
+                                                                    press=".onAnnouncementPress"
+                                                                    class="sapUiTinyMarginBottom sapUiMediumMarginEnd"
+                                                                />
+                                                            </HBox>
                                                             <FormattedText
                                                                 htmlText="{announcementsModel>description}"
                                                                 visible="{announcementsModel>expanded}"

@@ -26,17 +26,21 @@
                     >
                         <!-- Global Announcement Bar -->
                         <Toolbar
-                            id="idAnnouncementGlobalTlbr"
+                            id="idGlobalAnnouncementDetailTlbr"
                             height="2.5rem"
                             class="announcementBarCss"
                         >
-                            <ToolbarSpacer />
-                            <Text
-                                id="idAnnouncementGlobalTxt"
-                                text="{i18n>globalAnnouncementText}"
-                                class="sapUiSmallMargin announcementTxtCss"
-                            />
-                            <ToolbarSpacer />
+                            <HBox
+                                width="100%"
+                                class="marquee-container"
+                            >
+                                <Text
+                                    id="idGlobalAnnouncementDetailTxt"
+                                    text=""
+                                    class="announcementTxtCss marquee-text"
+                                    wrapping="false"
+                                />
+                            </HBox>
                         </Toolbar>
 
                         <!-- ShellBar -->
@@ -229,11 +233,16 @@
                                                             />
                                                         </items>
                                                     </HBox>
-                                                    <Link
-                                                        text="{= ${announcementDetailsModel>expanded} ? 'Read less' : 'Read more' }"
-                                                        press=".onAnnouncementItemPress"
-                                                        class="sapUiTinyMarginBottom"
-                                                    />
+                                                    <HBox
+                                                        width="100%"
+                                                        justifyContent="End"
+                                                    >
+                                                        <Link
+                                                            text="{= ${announcementDetailsModel>expanded} ? 'Read less' : 'Read more' }"
+                                                            press=".onAnnouncementItemPress"
+                                                            class="sapUiTinyMarginBottom sapUiMediumMarginEnd"
+                                                        />
+                                                    </HBox>
                                                     <FormattedText
                                                         htmlText="{announcementDetailsModel>description}"
                                                         visible="{announcementDetailsModel>expanded}"
