@@ -87,7 +87,7 @@
 
 /* Capsule style for tags */
 .announcementTagCss {
-    background-color: #edeaea;
+    background-color: #e90b0b;
     border-radius: 12px;
     padding: 2px 8px;
     font-size: 0.75rem;
@@ -302,4 +302,8 @@ body>#faqBtnUI5 {
 .emergencyReadMore {
   color: #d00000;
   font-weight: 500;
+}
+
+.announcementTagCss .sapMObjStatusText {
+    color: #ffffff !important;
 }
