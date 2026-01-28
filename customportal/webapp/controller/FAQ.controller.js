@@ -1,10 +1,10 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
+    "com/incture/customportal/controller/BaseController",
     "sap/ui/model/json/JSONModel"
-], function (Controller, JSONModel) {
+], function (BaseController, JSONModel) {
     "use strict";
 
-    return Controller.extend("com.incture.customportal.controller.FAQ", {
+    return BaseController.extend("com.incture.customportal.controller.FAQ", {
         onInit: function () {
             var oData = {
                 faqs: [

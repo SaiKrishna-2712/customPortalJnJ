@@ -1,9 +1,9 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller"
-], function (Controller) {
+    "com/incture/customportal/controller/BaseController"
+], function (BaseController) {
     "use strict";
 
-    return Controller.extend("com.incture.customportal.controller.KnowledgeArticleDetails", {
+    return BaseController.extend("com.incture.customportal.controller.KnowledgeArticleDetails", {
 
         onInit: function () {
             // Initialize the view

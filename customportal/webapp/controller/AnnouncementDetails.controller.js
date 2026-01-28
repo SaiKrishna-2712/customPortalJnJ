@@ -1,14 +1,14 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
+    "com/incture/customportal/controller/BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessageToast",
     "sap/ui/core/Fragment"
-], function (Controller, JSONModel, Filter, FilterOperator, MessageToast, Fragment) {
+], function (BaseController, JSONModel, Filter, FilterOperator, MessageToast, Fragment) {
     "use strict";
 
-    return Controller.extend("com.incture.customportal.controller.AnnouncementDetails", {
+    return BaseController.extend("com.incture.customportal.controller.AnnouncementDetails", {
 
         getBaseURL: function () {
             var appId = this.getOwnerComponent().getManifestEntry("/sap.app/id");

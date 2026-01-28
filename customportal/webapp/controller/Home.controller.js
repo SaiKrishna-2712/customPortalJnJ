@@ -1,5 +1,5 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
+    "com/incture/customportal/controller/BaseController",
     "sap/ui/core/Fragment",
     "sap/m/MessageToast",
     "sap/ui/model/json/JSONModel",
@@ -8,9 +8,9 @@ sap.ui.define([
     "sap/m/ImageContent",
     "sap/ui/layout/GridData",
     "com/incture/customportal/util/formatter"
-    ], function (Controller, Fragment, MessageToast, JSONModel, GenericTile, TileContent, ImageContent, GridData, formatter) {
+    ], function (BaseController, Fragment, MessageToast, JSONModel, GenericTile, TileContent, ImageContent, GridData, formatter) {
         "use strict";
-    return Controller.extend("com.incture.customportal.controller.App", {
+    return BaseController.extend("com.incture.customportal.controller.Home", {
         formatter: formatter,
         getBaseURL: function () {
             var appId = this.getOwnerComponent().getManifestEntry("/sap.app/id");
@@ -357,6 +357,7 @@ sap.ui.define([
                 error: function (oError) {
                     console.error("Failed to load announcements from OData API", oError);
                     oProcessAnnouncementsModel.setProperty("/announcements", []);
+                    oProcessAnnouncementsModel.setProperty("/processAnnouncementsCount", 0);
                     const oToolbar = that.byId("idGlobalAnnouncementTlbr");
                     if (oToolbar) oToolbar.setVisible(false);
                 }
@@ -434,6 +435,7 @@ sap.ui.define([
             });
 
             oModel.setProperty("/announcements", aAnnouncements);
+            oModel.setProperty("/processAnnouncementsCount", aAnnouncements.length);
 
             setTimeout(() => {
                 this._updateAnnouncementStyles();
