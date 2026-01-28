@@ -12,31 +12,7 @@ sap.ui.define([
         "use strict";
     return BaseController.extend("com.incture.customportal.controller.Home", {
         formatter: formatter,
-        getBaseURL: function () {
-            var appId = this.getOwnerComponent().getManifestEntry("/sap.app/id");
-            var appPath = appId.replaceAll(".", "/");
-            var appModulePath = jQuery.sap.getModulePath(appPath);
-            return appModulePath;
-        },
-
-        getCurrentUserDetails: async function () {
-            try {
-                const url = this.getBaseURL() + "/user-api/currentUser";
-                const oModel = new sap.ui.model.json.JSONModel();
-                await oModel.loadData(url);
-
-                const data = oModel.getData();
-                if (data && data.email) {
-                    return data;
-                } else {
-                    throw new Error("User details not found in response");
-                }
-            } catch (error) {
-                console.error("Failed to fetch current user:", error.message);
-                return null;
-            }
-        },
-
+        
 
         onInit: function () {
             var that = this;
@@ -120,9 +96,8 @@ sap.ui.define([
                     },
                 ]
             };
-            var oTilesModel = new JSONModel(oTilesData);
-            this.getView().setModel(oTilesModel, "tilesModel");
-
+            this.getOwnerComponent().getModel("tilesModel").setData(oTilesData);
+            
             //  Fetch Quick Links from API
             // var oQuickLinksModel = new sap.ui.model.json.JSONModel();
             // this.getView().setModel(oQuickLinksModel, "quickLinksModel");
@@ -205,7 +180,7 @@ sap.ui.define([
             // SINGLE API CALL FOR ALL ANNOUNCEMENTS (Emergency, Global, Process)
             this._fetchAllAnnouncements();
 
-            console.log("Tiles Model:", oTilesModel);
+            console.log("Tiles Model:", this.getOwnerComponent().getModel("tilesModel"));
 
             // Set up responsive scroll container behavior
             this._setupResponsiveScrollContainer();
@@ -252,6 +227,25 @@ sap.ui.define([
             // Handle window resize for responsive behavior
             this._attachResizeHandler();
         },
+
+                getCurrentUserDetails: async function () {
+            try {
+                const url = this.getBaseURL() + "/user-api/currentUser";
+                const oModel = new sap.ui.model.json.JSONModel();
+                await oModel.loadData(url);
+
+                const data = oModel.getData();
+                if (data && data.email) {
+                    return data;
+                } else {
+                    throw new Error("User details not found in response");
+                }
+            } catch (error) {
+                console.error("Failed to fetch current user:", error.message);
+                return null;
+            }
+        },
+
 
         getQuickLinks: function () {
             var that = this;
@@ -369,29 +363,6 @@ sap.ui.define([
          */
         _processProcessAnnouncements: function (allAnnouncements, oModel) {
             var that = this;
-            const getRelativeTime = function (dateString) {
-                if (!dateString) return "";
-                // Handle OData date format /Date(timestamp)/ or /Date(timestamp+offset)/
-                var timestamp = dateString;
-                if (typeof dateString === "string" && dateString.indexOf("/Date(") === 0) {
-                    var matches = dateString.match(/\/Date\((\d+)(?:[+-]\d+)?\)\//);
-                    if (matches && matches[1]) {
-                        timestamp = parseInt(matches[1]);
-                    }
-                }
-                const date = new Date(timestamp);
-                const now = new Date();
-                const diffMs = now - date;
-                const sec = Math.floor(diffMs / 1000);
-                const min = Math.floor(sec / 60);
-                const hr = Math.floor(min / 60);
-                const day = Math.floor(hr / 24);
-
-                if (sec < 60) return sec + " second" + (sec !== 1 ? "s" : "") + " ago";
-                if (min < 60) return min + " minute" + (min !== 1 ? "s" : "") + " ago";
-                if (hr < 24) return hr + " hour" + (hr !== 1 ? "s" : "") + " ago";
-                return day + " day" + (day !== 1 ? "s" : "") + " ago";
-            };
 
             const hasProcessType = function (announcementType) {
                 if (!announcementType) return false;
@@ -415,7 +386,7 @@ sap.ui.define([
                     title: item.title || "No Title",
                     description: item.description || "",
                     htmlDescription: that._parseRichText(item.description), // UPDATED: Store original HTML
-                    date: getRelativeTime(item.startAnnouncement),
+                    date: that.formatter.timeAgo(item.startAnnouncement),
                     tags: tags,
                     announcementType: item.announcementType || "",
                     read: item.isRead || false,
@@ -483,26 +454,6 @@ sap.ui.define([
         */
         _processEmergencyAnnouncements: function (allAnnouncements) {
             var that = this;
-            const timeAgo = function (dateString) {
-                var timestamp = dateString;
-                if (typeof dateString === "string" && dateString.indexOf("/Date(") === 0) {
-                    var matches = dateString.match(/\/Date\((\d+)(?:[+-]\d+)?\)\//);
-                    if (matches && matches[1]) {
-                        timestamp = parseInt(matches[1]);
-                    }
-                }
-                const d = new Date(timestamp);
-                const now = new Date();
-                const diff = now - d;
-                const mins = Math.floor(diff / 60000);
-                const hrs = Math.floor(mins / 60);
-                const days = Math.floor(hrs / 24);
-
-                if (mins < 1) return "Just now";
-                if (mins < 60) return mins + " minute" + (mins === 1 ? "" : "s") + " ago";
-                if (hrs < 24) return hrs + " hour" + (hrs === 1 ? "" : "s") + " ago";
-                return days + " day" + (days === 1 ? "" : "s") + " ago";
-            };
 
             // UPDATED: Add status filter for PUBLISHED
             let aAnnouncements = allAnnouncements.filter(item =>
@@ -517,31 +468,12 @@ sap.ui.define([
                 id: item.announcementId,
                 title: item.title,
                 description: that._parseRichText(item.description),
-                timeAgo: timeAgo(item.startAnnouncement)
+                timeAgo: that.formatter.timeAgo(item.startAnnouncement)
             }));
 
-            var oComponent = this.getOwnerComponent();
-            // Execute ONLY for Home route and ONLY once
-            if(oComponent._bHomeInitialized !== true) {
-                oComponent._bHomeInitialized = true;
-                this._showEmergencyDialog(transformed);
-            }
+            this._showEmergencyDialog(transformed);
         },
 
-        /**
-         * Helper: Parse OData date format
-         */
-        _parseODataDate: function (dateString) {
-            if (!dateString) return new Date(0);
-
-            if (typeof dateString === "string" && dateString.indexOf("/Date(") === 0) {
-                var matches = dateString.match(/\/Date\((\d+)(?:[+-]\d+)?\)\//);
-                if (matches && matches[1]) {
-                    return new Date(parseInt(matches[1]));
-                }
-            }
-            return new Date(dateString);
-        },
 
         /**
          * Update the global announcement text display
@@ -649,44 +581,6 @@ sap.ui.define([
             if (this._oEmergencyDialog) {
                 this._oEmergencyDialog.destroy();
                 this._oEmergencyDialog = null;
-            }
-        },
-
-        /**
-         * Helper: Check if announcement is expired
-         */
-        _isExpired: function (endDateString) {
-            if (!endDateString) return false;
-            var timestamp = endDateString;
-            if (typeof endDateString === "string" && endDateString.indexOf("/Date(") === 0) {
-                timestamp = parseInt(endDateString.replace("/Date(", "").replace(")/", ""));
-            }
-            const endDate = new Date(timestamp);
-            const now = new Date();
-            return now > endDate;
-        },
-
-        /**
- * Helper: Check if announcement type contains specified type
- */
-        _hasAnnouncementType: function (announcementType, typeToCheck) {
-            if (!announcementType) return false;
-            const types = announcementType.split(',').map(type => type.trim());
-            return types.includes(typeToCheck);
-        },
-
-        // Optional: Add formatter for date display
-        formatter: {
-            formatDate: function (sDate) {
-                if (!sDate) return "";
-                const date = new Date(sDate);
-                return date.toLocaleDateString("en-US", {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
             }
         },
 
@@ -816,7 +710,7 @@ sap.ui.define([
          */
         _createTiles: function () {
             var oGrid = this.byId("idApplicationsTileGrid");
-            var oTilesModel = this.getView().getModel("tilesModel");
+            var oTilesModel = this.getOwnerComponent().getModel("tilesModel");
             var aTiles = oTilesModel.getProperty("/tiles");
 
             console.log(aTiles);
@@ -1310,20 +1204,6 @@ sap.ui.define([
             tempJsonModel.attachRequestFailed(function (oEvent) {
                 rError(oEvent);
             }.bind(rError));
-        },
-
-        _parseRichText: function (sHtml) {
-            if (!sHtml) {
-                return "";
-            }
-
-            const oParser = new DOMParser();
-            const oDoc = oParser.parseFromString(sHtml, "text/html");
-
-            // Optional cleanup
-            oDoc.querySelectorAll("script, style").forEach(el => el.remove());
-
-            return oDoc.body.innerHTML;
         }
 
     });

@@ -469,12 +469,12 @@ sap.ui.define([
 
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteApp");
+            oRouter.navTo("RouteHome");
         },
 
         onLogoPress: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteApp");
+            oRouter.navTo("RouteHome");
         },
 
         onAvatarPress: function (oEvent) {

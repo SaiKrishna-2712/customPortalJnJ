@@ -79,7 +79,10 @@
         "dataSource": "quickLinksService",
         "type": "sap.ui.model.odata.v2.ODataModel",
         "preload": true
-      }
+      },
+      "tilesModel": {
+				"type": "sap.ui.model.json.JSONModel"
+			}
     },
     "resources": {
       "css": [
@@ -102,10 +105,10 @@
       },
       "routes": [
         {
-          "name": "RouteApp",
+          "name": "RouteHome",
           "pattern": ":?query:",
           "target": [
-            "TargetApp"
+            "TargetHome"
           ]
         },
         {
@@ -117,8 +120,8 @@
         }
       ],
       "targets": {
-        "TargetApp": {
-          "name": "App"
+        "TargetHome": {
+          "name": "Home"
         },
         "TargetAnnouncementDetails": {
           "name": "AnnouncementDetails"

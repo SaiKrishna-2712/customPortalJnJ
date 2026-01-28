@@ -1,0 +1,542 @@
+<mvc:View
+    controllerName="com.incture.customportal.controller.Home"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:l="sap.ui.layout"
+    xmlns="sap.m"
+    displayBlock="true"
+>
+    <Page
+        id="idMainPg"
+        showHeader="false"
+        class="greyBackgroundCss"
+    >
+        <content>
+            <!-- Main container-->
+            <VBox
+                id="idMainContainerVBox"
+                width="100%"
+                class="greyBackgroundCss"
+            >
+                <!-- Global Announcement Bar -->
+                <Toolbar
+                    id="idGlobalAnnouncementTlbr"
+                    height="2.5rem"
+                    class="announcementBarCss"
+                >
+                    <HBox
+                        width="100%"
+                        class="marquee-container"
+                    >
+                        <Text
+                            id="idGlobalAnnouncementTxt"
+                            text=""
+                            class="announcementTxtCss marquee-text"
+                            wrapping="false"
+                        />
+                    </HBox>
+                </Toolbar>
+
+                <!-- ShellBar -->
+                <f:ShellBar
+                    id="idMainShellBar"
+                    title="{i18n>webPortalTitle}"
+                    homeIcon="./image/JJ_Logo_Stacked_Red_RGB.png"
+                    showNotifications="false"
+                    showProductSwitcher="false"
+                    class="shellBarCss"
+                    homeIconPressed=".onLogoPress"
+                >
+                    <f:searchManager>
+                        <f:SearchManager
+                            id="idMainSearchMgr"
+                            placeholder="{i18n>searchPlaceholder}"
+                            maxLength="80"
+                            search="onShellSearch"
+                        />
+                    </f:searchManager>
+                    <f:profile>
+                        <f:Avatar
+                            id="idUserProfileAvtr"
+                            initials="JD"
+                            displaySize="XS"
+                            backgroundColor="Accent1"
+                            tooltip="{i18n>userProfileTooltip}"
+                            press="onAvatarPress"
+                        />
+                    </f:profile>
+                </f:ShellBar>
+
+                <!-- Banner Section -->
+                <l:Grid
+                    id="idBannerGrid"
+                    defaultSpan="L12 M12 S12"
+                    width="98%"
+                >
+                    <VBox
+                        width="100%"
+                        class="sapUiContentPadding bannerContainerCss"
+                    >
+                        <layoutData>
+                            <l:GridData span="L12 M12 S12" />
+                        </layoutData>
+                        <FlexBox
+                            height="10rem"
+                            alignItems="Center"
+                            justifyContent="Start"
+                            class="bannerFlexBoxCss"
+                            wrap="Wrap"
+                            direction="Row"
+                        >
+                            <VBox
+                                class="sapUiSmallMargin"
+                                alignItems="Start"
+                            >
+                                <!-- Date & Temperature -->
+                                <Text
+                                    id="idDateTempTxt"
+                                    text="{bannerModel>/dateTemp}"
+                                    class="sapUiSmallMarginBottom bannerDateTempCss"
+                                    wrapping="true"
+                                />
+                                <!-- Greeting -->
+                                <Title
+                                    id="idGreetingTxt"
+                                    text="Hello, {bannerModel>/userName}"
+                                    level="H2"
+                                    class="sapUiSmallMarginBottom bannerGreetingCss"
+                                    wrapping="true"
+                                />
+                            </VBox>
+                        </FlexBox>
+                    </VBox>
+                </l:Grid>
+
+                <!--  Main Content Area -->
+                <VBox
+                    class="sapUiContentPadding"
+                    height="100%"
+                >
+                    <layoutData>
+                        <FlexItemData
+                            growFactor="1"
+                            shrinkFactor="1"
+                        />
+                    </layoutData>
+
+                    <l:Grid
+                        id="idMainLayoutGrd"
+                        defaultSpan="L12 M12 S12"
+                        width="100%"
+                        hSpacing="1"
+                        vSpacing="1"
+                    >
+                        <!-- Left Section  -->
+                        <VBox width="100%">
+                            <layoutData>
+                                <l:GridData span="L9 M12 S12" />
+                            </layoutData>
+
+                            <!-- Applications Section -->
+                            <VBox
+                                id="idApplicationsTileContainerVBx"
+                                class="sapUiMediumMarginBottom sapUiContentPadding"
+                                backgroundDesign="Solid"
+                            >
+                                <Title
+                                    text="{i18n>applicationsTitle}"
+                                    level="H3"
+                                    class="sapUiSmallMarginBottom sectionTitleCss"
+                                />
+                                <ScrollContainer
+                                    id="idApplicationsScrollContainer"
+                                    width="100%"
+                                    vertical="true"
+                                    horizontal="false"
+                                    focusable="false"
+                                >
+                                    <VBox
+                                        alignItems="Center"
+                                        width="100%"
+                                    >
+                                        <l:Grid
+                                            id="idApplicationsTileGrid"
+                                            defaultSpan="L3 M6 S12"
+                                            hSpacing="1"
+                                            vSpacing="1"
+                                            class="customTileGrid"
+                                        />
+                                    </VBox>
+                                </ScrollContainer>
+
+                                <core:HTML
+                                    id="idApplicationFrameHtml"
+                                    content=""
+                                />
+                            </VBox>
+
+                            <!-- Quick Links section -->
+                            <VBox
+                                class="sapUiMediumMarginBottom sapUiContentPadding"
+                                backgroundDesign="Solid"
+                            >
+                                <Title
+                                    text="{i18n>quickLinksTitle}"
+                                    level="H3"
+                                    class="sapUiSmallMarginBottom sectionTitleCss"
+                                />
+
+                                <l:Grid
+                                    defaultSpan="L6 M6 S12"
+                                    hSpacing="1"
+                                    vSpacing="1"
+                                    content="{quickLinksDataModel>/links/value}"
+                                >
+                                    <Link
+                                        text="{quickLinksDataModel>linkTitle}"
+                                        visible="{= !${quickLinksDataModel>isDelete} }"
+                                        press="onQuickLinkPress"
+                                    >
+                                        <customData>
+                                            <core:CustomData
+                                                key="action"
+                                                value="{quickLinksDataModel>linkURL}"
+                                            />
+                                        </customData>
+                                        <layoutData>
+                                            <l:GridData span="L6 M6 S12" />
+                                        </layoutData>
+                                    </Link>
+                                </l:Grid>
+                            </VBox>
+
+                            <!-- Featured Knowledge Articles Section -->
+                            <VBox
+                                class="sapUiMediumMarginBottom sapUiContentPadding"
+                                backgroundDesign="Solid"
+                            >
+                                <!-- Header -->
+                                <FlexBox
+                                    alignItems="End"
+                                    justifyContent="SpaceBetween"
+                                    wrap="Wrap"
+                                    direction="Row"
+                                >
+                                    <Title
+                                        text="{i18n>featuredKnowledgeArticlesTitle}"
+                                        class="sectionTitleCss"
+                                    />
+                                    <Link
+                                        target="_blank"
+                                        text="{i18n>viewAllText}"
+                                        href="https://jnjfinance.service-now.com/fsp?id=kb_view2&amp;utm_source=VITAL&amp;utm_medium=navigation&amp;utm_campaign=homepage"
+                                        class="sapUiSmallMarginTop"
+                                    />
+                                </FlexBox>
+
+                                <!-- Articles Grid for Responsive Layout -->
+                                <l:Grid
+                                    defaultSpan="L12 M12 S12"
+                                    hSpacing="0"
+                                    vSpacing="0.5"
+                                >
+                                    <VBox
+                                        items="{articlesModel>/values}"
+                                        width="100%"
+                                    >
+                                        <layoutData>
+                                            <l:GridData span="L12 M12 S12" />
+                                        </layoutData>
+
+                                        <!-- Responsive Article Item -->
+                                        <FlexBox
+                                            alignItems="Start"
+                                            justifyContent="Start"
+                                            class="sapUiTinyMarginTop"
+                                            wrap="Wrap"
+                                            direction="Row"
+                                        >
+                                            <!-- Article title - Responsive width -->
+                                            <VBox
+                                                class="sapUiSmallMarginEnd rightBorderCss"
+                                                width="auto"
+                                            >
+                                                <layoutData>
+                                                    <FlexItemData
+                                                        growFactor="1"
+                                                        shrinkFactor="1"
+                                                        minWidth="200px"
+                                                    />
+                                                </layoutData>
+                                                <HBox>
+                                                    <Label
+                                                        text="{articlesModel>number}"
+                                                        class="sapUiTinyMarginEnd"
+                                                    />
+                                                    <Link
+                                                        class="linkTextCss"
+                                                        target="_blank"
+                                                        text="{articlesModel>articleName}"
+                                                        href="{articlesModel>url}"
+                                                        wrapping="true"
+                                                    />
+                                                </HBox>
+                                            </VBox>
+
+                                            <!-- Views - Fixed width but responsive positioning -->
+                                            <HBox
+                                                alignItems="Center"
+                                                class="sapUiSmallMarginStart"
+                                            >
+                                                <layoutData>
+                                                    <FlexItemData
+                                                        shrinkFactor="0"
+                                                        minWidth="100px"
+                                                    />
+                                                </layoutData>
+                                                <Label
+                                                    text="{= ${articlesModel>views} + ' ' + ${i18n>viewsText}}"
+                                                    class="viewsTextCss"
+                                                />
+                                            </HBox>
+                                        </FlexBox>
+                                    </VBox>
+                                </l:Grid>
+                            </VBox>
+                        </VBox>
+
+                        <!-- Right Section (30%) -->
+                        <VBox width="100%">
+                            <layoutData>
+                                <l:GridData span="L3 M12 S12" />
+                            </layoutData>
+
+                            <!-- Announcements Section -->
+                            <VBox
+                                class="sapUiMediumMarginBottom sapUiContentPadding"
+                                backgroundDesign="Solid"
+                            >
+                                <HBox
+                                    justifyContent="SpaceBetween"
+                                    alignItems="Center"
+                                >
+                                    <Title
+                                        text="{i18n>announcementsTitle}"
+                                        level="H3"
+                                        class="sectionTitleCss"
+                                    />
+                                    <Link
+                                        text="{i18n>viewAllText}"
+                                        press=".onViewAllPress"
+                                    />
+                                </HBox>
+                                <ScrollContainer
+                                    height="18rem"
+                                    width="100%"
+                                    vertical="true"
+                                    horizontal="false"
+                                    focusable="false"
+                                >
+                                    <List
+                                        id="idAnnouncementsLst"
+                                        items="{announcementsModel>/announcements}"
+                                        mode="None"
+                                        noDataText="{i18n>noAnnouncementsText}"
+                                    >
+                                        <CustomListItem
+                                            type="Active"
+                                            press=".onAnnouncementPress"
+                                        >
+                                            <HBox
+                                                width="100%"
+                                                class="sapUiSmallMargin sapUiSmallMarginBottom"
+                                                alignItems="Stretch"
+                                            >
+                                                <!-- Vertical line -->
+                                                <VBox
+                                                    class="lineContainer"
+                                                    width="auto"
+                                                    height="100%"
+                                                >
+                                                    <VBox
+                                                        class="lineBlue"
+                                                        height="100%"
+                                                    />
+                                                </VBox>
+                                                <!-- Content -->
+                                                <VBox
+                                                    width="100%"
+                                                    renderType="Bare"
+                                                    class="sapUiTinyMarginStart"
+                                                >
+                                                    <Text
+                                                        text="{announcementsModel>title}"
+                                                        class="sapUiTinyMarginBottom announcementTextUnread"
+                                                    />
+                                                    <Text
+                                                        text="{announcementsModel>date}"
+                                                        class="sapUiTinyMarginBottom announcementTextUnread"
+                                                    />
+                                                    <HBox
+                                                        wrap="Wrap"
+                                                        class="sapUiTinyMarginBottom"
+                                                        items="{announcementsModel>tags}"
+                                                    >
+                                                        <items>
+                                                            <ObjectStatus
+                                                                text="{announcementsModel>}"
+                                                                state="None"
+                                                                class="sapUiTinyMarginEnd announcementTagCss announcementTextUnread"
+                                                            />
+                                                        </items>
+                                                    </HBox>
+                                                    <HBox
+                                                        width="100%"
+                                                        justifyContent="End"
+                                                    >
+                                                        <Link
+                                                            text="{= ${announcementsModel>expanded} ? 'Read less' : 'Read more' }"
+                                                            press=".onAnnouncementPress"
+                                                            class="sapUiTinyMarginBottom sapUiMediumMarginEnd"
+                                                        />
+                                                    </HBox>
+                                                    <FormattedText
+                                                        htmlText="{announcementsModel>description}"
+                                                        visible="{announcementsModel>expanded}"
+                                                        class="announcementTextUnread"
+                                                    />
+                                                </VBox>
+                                            </HBox>
+                                        </CustomListItem>
+                                    </List>
+                                </ScrollContainer>
+                            </VBox>
+
+                            <!-- Help Section -->
+                            <VBox
+                                class="sapUiMediumMarginBottom sapUiContentPadding"
+                                backgroundDesign="Solid"
+                            >
+                                <Title
+                                    text="{i18n>helpSectionTitle}"
+                                    level="H3"
+                                    class="sapUiSmallMarginBottom sectionTitleCss"
+                                    wrapping="true"
+                                />
+                                <Text
+                                    text="{i18n>helpSectionDescription}"
+                                    class="sapUiSmallMarginBottom"
+                                />
+                                <HBox justifyContent="End">
+                                    <Button
+                                        text="{i18n>signFiReportingCatalogButtonText}"
+                                        press="onCatalogPress"
+                                    />
+                                </HBox>
+                            </VBox>
+
+                            <!-- Training Section -->
+                            <VBox
+                                class="sapUiMediumMarginBottom sapUiContentPadding"
+                                backgroundDesign="Solid"
+                            >
+                                <Title
+                                    text="{i18n>trainingSectionTitle}"
+                                    level="H3"
+                                    class="sapUiSmallMarginBottom sectionTitleCss"
+                                />
+                                <Text
+                                    text="{i18n>trainingSectionDescription}"
+                                    class="sapUiSmallMarginBottom"
+                                />
+                                <HBox justifyContent="End">
+                                    <Button
+                                        text="{i18n>visitTrainingButtonText}"
+                                        press="onTrainingPress"
+                                    />
+                                </HBox>
+                            </VBox>
+                            <!-- FAQ Section -->
+                            <!-- <Panel
+                                headerText="{i18n>faqSectionTitle}"
+                                expandable="false"
+                                expanded="true"
+                                width="100%"
+                            >
+                                <VBox id="idfaqVBox" />
+                            </Panel> -->
+                        </VBox>
+                    </l:Grid>
+                </VBox>
+            </VBox>
+            <VBox class="sapUiMediumMarginBottom">
+                <mvc:XMLView
+                    id="faqView"
+                    viewName="com.incture.customportal.view.FAQ"
+                    xmlns:mvc="sap.ui.core.mvc"
+                />
+            </VBox>
+
+            <!-- Footer -->
+            <VBox
+                class="sapUiContentPadding"
+                backgroundDesign="Transparent"
+            >
+                <OverflowToolbar
+                    class="sapUiResponsiveContentPadding greyBackgroundCss"
+                >
+                    <!-- Left side content - Company Logo and links -->
+                    <HBox
+                        alignItems="Center"
+                        wrap="Wrap"
+                        class="sapUiResponsiveMargin"
+                    >
+                        <Image
+                            src="image/JJ_Logo_SingleLine_Red_RGB.png"
+                            alt="JnJ Logo"
+                            densityAware="false"
+                            class="sapUiTinyMarginEnd"
+                            width="130px"
+                            height="25px"
+                        />
+
+                        <Link
+                            text="{i18n>privacyPolicyText}"
+                            press="onPrivacyPress"
+                            class="footerLinkCss sapUiTinyMarginEnd"
+                        />
+                        <Text
+                            text="|"
+                            class="footerTextCss sapUiTinyMarginEnd"
+                        />
+
+                        <Link
+                            text="{i18n>termsOfUseText}"
+                            press="onTermsPress"
+                            class="footerLinkCss sapUiTinyMarginEnd"
+                        />
+                        <Text
+                            text="|"
+                            class="footerTextCss sapUiTinyMarginEnd"
+                        />
+
+                        <Link
+                            text="{i18n>releaseNotesText}"
+                            press="onReleasePress"
+                            class="footerLinkCss"
+                        />
+                    </HBox>
+
+                    <ToolbarSpacer />
+
+                    <Text
+                        text="{i18n>copyrightText}"
+                        class="footerTextCss sapUiResponsiveMargin"
+                        textAlign="End"
+                    />
+                </OverflowToolbar>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>
