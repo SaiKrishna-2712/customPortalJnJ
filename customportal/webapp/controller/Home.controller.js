@@ -98,80 +98,6 @@ sap.ui.define([
             };
             this.getOwnerComponent().getModel("tilesModel").setData(oTilesData);
             
-            //  Fetch Quick Links from API
-            // var oQuickLinksModel = new sap.ui.model.json.JSONModel();
-            // this.getView().setModel(oQuickLinksModel, "quickLinksModel");
-
-            // oQuickLinksModel.loadData(
-            //     "/JnJ_Workzone_Portal_Destination_Java/odata/v4/QuickLinkService/QuickLinks",
-            //     null,
-            //     true,
-            //     "GET",
-            //     false,
-            //     false,
-            //     {
-            //         "Content-Type": "application/json"
-            //     }
-            // );
-
-            // oQuickLinksModel.attachRequestCompleted(function (oEvent) {
-            //     const oData = oEvent.getSource().getData();
-
-            //     // Handle both { value: [...] } and direct array response
-            //     const rawData = oData.value || oData || [];
-
-            //     // FIRST: Filter out deleted items
-            //     const filteredData = rawData.filter(item => {
-            //         return item.isDelete !== true;
-            //     });
-
-            //     // THEN: Map to the required structure
-            //     const aQuickLinks = filteredData.map(item => ({
-            //         text: item.linkTitle || "Untitled",
-            //         action: item.linkURL || "",
-            //         active: true
-            //     }));
-
-            //     oQuickLinksModel.setData({ links: aQuickLinks });
-            // });
-
-            // var oQuickLinksModel = new sap.ui.model.json.JSONModel();
-            // this.getView().setModel(oQuickLinksModel, "quickLinksModel");
-
-            // this.doAjax(
-            //     "JnJ_Workzone_Portal_Destination_Java/odata/v4/QuickLinkService/QuickLinks",
-            //     "GET",
-            //     null,
-
-            //     // ✅ SUCCESS
-            //     function (data) {
-            //         var rawData = data?.value || [];
-
-            //         var aQuickLinks = rawData
-            //             .filter(item => item.isDelete === false)
-            //             .map(item => ({
-            //                 text: item.linkTitle || "Untitled",
-            //                 action: item.linkURL || "",
-            //                 active: true
-            //             }));
-
-            //         // Guard: API returned only deleted / empty records
-            //         if (!aQuickLinks.length) {
-            //             aQuickLinks = that._getFallbackQuickLinks();
-            //         }
-
-            //         oQuickLinksModel.setData({ links: aQuickLinks });
-            //     },
-
-            //     // ❌ ERROR
-            //     function () {
-            //         console.log("Quick Links API failed – loading fallback data");
-            //         oQuickLinksModel.setData({
-            //             links: that._getFallbackQuickLinks()
-            //         });
-            //     }
-            // );
-            
             this.getQuickLinks();
 
             // Create tiles programmatically
@@ -228,23 +154,6 @@ sap.ui.define([
             this._attachResizeHandler();
         },
 
-                getCurrentUserDetails: async function () {
-            try {
-                const url = this.getBaseURL() + "/user-api/currentUser";
-                const oModel = new sap.ui.model.json.JSONModel();
-                await oModel.loadData(url);
-
-                const data = oModel.getData();
-                if (data && data.email) {
-                    return data;
-                } else {
-                    throw new Error("User details not found in response");
-                }
-            } catch (error) {
-                console.error("Failed to fetch current user:", error.message);
-                return null;
-            }
-        },
 
 
         getQuickLinks: function () {
@@ -364,15 +273,10 @@ sap.ui.define([
         _processProcessAnnouncements: function (allAnnouncements, oModel) {
             var that = this;
 
-            const hasProcessType = function (announcementType) {
-                if (!announcementType) return false;
-                return announcementType.split(",").map(t => t.trim()).includes("Process");
-            };
-
             // UPDATED: Add status filter for PUBLISHED
             let aAnnouncements = allAnnouncements.filter(item =>
                 item.isActive === true && 
-                hasProcessType(item.announcementType) &&
+                that._hasAnnouncementType(item.announcementType, "Process") &&
                 item.announcementStatus === "PUBLISHED"
             );
 
@@ -406,7 +310,6 @@ sap.ui.define([
             });
 
             oModel.setProperty("/announcements", aAnnouncements);
-            oModel.setProperty("/processAnnouncementsCount", aAnnouncements.length);
 
             setTimeout(() => {
                 this._updateAnnouncementStyles();
@@ -1176,34 +1079,6 @@ sap.ui.define([
         onViewAllArticles: function () {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             oRouter.navTo("RouteKnowledgeArticleDetails");
-        },
-
-        doAjax: function (sUrl, sMethod, oData, rSuccess, rError, oHeaders) {
-            var that = this;
-            sUrl = sap.ui.require.toUrl("com/incture/customportal/") + sUrl;
-            var headers = {
-                "Content-Type": "application/json"
-            };
-            if (oData) {
-                oData = JSON.stringify(oData);
-            }
-            if (oHeaders) {
-                if (oHeaders["Content-Type"]) {
-                    headers = oHeaders;
-                } else {
-                    Object.assign(headers, oHeaders);
-                }
-            }
-
-            var tempJsonModel = new sap.ui.model.json.JSONModel();
-            this.getView().setModel(tempJsonModel, "tempJsonModel");
-            tempJsonModel.loadData(sUrl, oData, true, sMethod, false, false, headers);
-            tempJsonModel.attachRequestCompleted(function (oEvent) {
-                rSuccess(oEvent.getSource().getData());
-            }.bind(rSuccess));
-            tempJsonModel.attachRequestFailed(function (oEvent) {
-                rError(oEvent);
-            }.bind(rError));
         }
 
     });

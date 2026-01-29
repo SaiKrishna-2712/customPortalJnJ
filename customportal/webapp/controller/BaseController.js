@@ -100,6 +100,24 @@ sap.ui.define([
             return types.includes(typeToCheck);
         },
 
+        getCurrentUserDetails: async function () {
+            try {
+                const url = this.getBaseURL() + "/user-api/currentUser";
+                const oModel = new sap.ui.model.json.JSONModel();
+                await oModel.loadData(url);
+
+                const data = oModel.getData();
+                if (data && data.email) {
+                    return data;
+                } else {
+                    throw new Error("User details not found in response");
+                }
+            } catch (error) {
+                console.error("Failed to fetch current user:", error.message);
+                return null;
+            }
+        },
+
 
 
     });

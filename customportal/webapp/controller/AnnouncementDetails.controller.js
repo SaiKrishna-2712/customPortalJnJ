@@ -10,31 +10,6 @@ sap.ui.define([
 
     return BaseController.extend("com.incture.customportal.controller.AnnouncementDetails", {
 
-        getBaseURL: function () {
-            var appId = this.getOwnerComponent().getManifestEntry("/sap.app/id");
-            var appPath = appId.replaceAll(".", "/");
-            var appModulePath = jQuery.sap.getModulePath(appPath);
-            return appModulePath;
-        },
-
-        getCurrentUserDetails: async function () {
-            try {
-                const url = this.getBaseURL() + "/user-api/currentUser";
-                const oModel = new sap.ui.model.json.JSONModel();
-                await oModel.loadData(url);
-
-                const data = oModel.getData();
-                if (data && data.email) {
-                    return data;
-                } else {
-                    throw new Error("User details not found in response");
-                }
-            } catch (error) {
-                console.error("Failed to fetch current user:", error.message);
-                return null;
-            }
-        },
-
         onInit: function () {
             // Initialize filter model
             var oFilterModel = new JSONModel({
@@ -137,37 +112,8 @@ sap.ui.define([
          */
         _processProcessAnnouncements: function (allAnnouncements, oModel) {
             var that = this;
-            const getRelativeTime = function (dateString) {
-                if (!dateString) return "";
-                // Handle OData date format /Date(timestamp)/ or /Date(timestamp+offset)/
-                var timestamp = dateString;
-                if (typeof dateString === "string" && dateString.indexOf("/Date(") === 0) {
-                    var matches = dateString.match(/\/Date\((\d+)(?:[+-]\d+)?\)\//);
-                    if (matches && matches[1]) {
-                        timestamp = parseInt(matches[1]);
-                    }
-                }
-                const date = new Date(timestamp);
-                const now = new Date();
-                const diffMs = now - date;
-                const sec = Math.floor(diffMs / 1000);
-                const min = Math.floor(sec / 60);
-                const hr = Math.floor(min / 60);
-                const day = Math.floor(hr / 24);
 
-                if (sec < 60) return sec + " second" + (sec !== 1 ? "s" : "") + " ago";
-                if (min < 60) return min + " minute" + (min !== 1 ? "s" : "") + " ago";
-                if (hr < 24) return hr + " hour" + (hr !== 1 ? "s" : "") + " ago";
-                return day + " day" + (day !== 1 ? "s" : "") + " ago";
-            };
-
-            const hasProcessType = function (announcementType) {
-                if (!announcementType) return false;
-                return announcementType.split(",").map(t => t.trim()).includes("Process");
-            };
-
-            let aAnnouncements = allAnnouncements.filter(item => item.isActive === true && hasProcessType(item.announcementType) && item.announcementStatus === "PUBLISHED");
-
+            let aAnnouncements = allAnnouncements.filter(item => item.isActive === true && that._hasAnnouncementType(item.announcementType, "Process") && item.announcementStatus === "PUBLISHED");
 
             aAnnouncements = aAnnouncements.map(item => {
                 const tags = (item.toTypes || [])
@@ -178,7 +124,7 @@ sap.ui.define([
                     id: item.announcementId,
                     title: item.title || "No Title",
                     description: that._parseRichText(item.description),
-                    date: getRelativeTime(item.startAnnouncement),
+                    date: that.formatter.timeAgo(item.startAnnouncement),
                     tags: tags,
                     announcementType: item.announcementType || "",
                     read: item.isRead || false,
@@ -294,43 +240,6 @@ sap.ui.define([
                 clearInterval(this._globalAnnouncementInterval);
                 this._globalAnnouncementInterval = null;
             }
-        },
-
-        /**
-         * Helper: Check if announcement is expired
-         */
-        _isExpired: function (endDateString) {
-            if (!endDateString) return false;
-            var timestamp = endDateString;
-            if (typeof endDateString === "string" && endDateString.indexOf("/Date(") === 0) {
-                timestamp = parseInt(endDateString.replace("/Date(", "").replace(")/", ""));
-            }
-            const endDate = new Date(timestamp);
-            const now = new Date();
-            return now > endDate;
-        },
-
-        _hasAnnouncementType: function (announcementType, typeToCheck) {
-            if (!announcementType) return false;
-            const types = announcementType.split(',').map(type => type.trim());
-            return types.includes(typeToCheck);
-        },
-
-
-
-        /**
-         * Helper: Parse OData date format
-         */
-        _parseODataDate: function (dateString) {
-            if (!dateString) return new Date(0);
-
-            if (typeof dateString === "string" && dateString.indexOf("/Date(") === 0) {
-                var matches = dateString.match(/\/Date\((\d+)(?:[+-]\d+)?\)\//);
-                if (matches && matches[1]) {
-                    return new Date(parseInt(matches[1]));
-                }
-            }
-            return new Date(dateString);
         },
 
         onTopicFilterChange: function () {
@@ -519,20 +428,6 @@ sap.ui.define([
 
         onReleasePress: function () {
             MessageToast.show("Release Notes");
-        },
-
-        _parseRichText: function (sHtml) {
-            if (!sHtml) {
-                return "";
-            }
-
-            const oParser = new DOMParser();
-            const oDoc = oParser.parseFromString(sHtml, "text/html");
-
-            // Optional cleanup
-            oDoc.querySelectorAll("script, style").forEach(el => el.remove());
-
-            return oDoc.body.innerHTML;
         }
 
     });
