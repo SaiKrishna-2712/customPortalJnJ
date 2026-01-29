@@ -188,7 +188,7 @@
                             class="sapUiContentPadding"
                             backgroundDesign="Solid"
                             busyIndicatorDelay="0"
-                            busy="false"
+                            busy="{announcementDetailsModel>/showAnnouncementBusy}"
                         >
                             <!-- Announcements List -->
                             <List
