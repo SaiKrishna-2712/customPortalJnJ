@@ -85,13 +85,26 @@
                 <VBox
                     class="sapUiMediumMarginTop sapUiMediumMarginBegin sapUiMediumMarginEnd"
                 >
-                    <Title
-                        text="Announcements"
-                        level="H1"
-                        class="sapUiMediumMarginBottom"
-                    />
-                </VBox>
+                    <HBox
+                        justifyContent="SpaceBetween"
+                        alignItems="Center"
+                    >
+                        <Title
+                            text="Announcements"
+                            level="H1"
+                        />
 
+                        <!-- Announcements Search -->
+                        <SearchField
+                            id="idAnnouncementSearchField"
+                            width="22rem"
+                            placeholder="Search announcements by title"
+                            liveChange=".onAnnouncementSearchLive"
+                            search=".onAnnouncementSearch"
+                            class="sapUiTinyMarginBottom sapUiTinyMarginEnd"
+                        />
+                    </HBox>
+                </VBox>
                 <!-- Main Content Area -->
                 <l:Grid
                     id="idAnnouncementLayoutGrd"
@@ -174,6 +187,8 @@
                         <VBox
                             class="sapUiContentPadding"
                             backgroundDesign="Solid"
+                            busyIndicatorDelay="0"
+                            busy="false"
                         >
                             <!-- Announcements List -->
                             <List

@@ -4,7 +4,8 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessageToast",
-    "sap/ui/core/Fragment"
+    "sap/ui/core/Fragment",
+
 ], function (BaseController, JSONModel, Filter, FilterOperator, MessageToast, Fragment) {
     "use strict";
 
@@ -370,6 +371,7 @@ sap.ui.define([
                     oContainerBox.getItems().forEach(applyStyle);
                 }
             });
+            oModel.setProperty("/showAnnouncementBusy", false);
         },
 
         onManageTopics: function () {
@@ -428,6 +430,61 @@ sap.ui.define([
 
         onReleasePress: function () {
             MessageToast.show("Release Notes");
+        },
+
+        onAnnouncementSearchLive: function (oEvent) {
+            console.log(oEvent);
+        },
+
+        onAnnouncementSearch: function (oEvent) {
+            var oDataModel = this.getOwnerComponent().getModel("announcementModel");
+            var searchFilter = oEvent.getParameter("query") ;
+            var oAnnouncementDetailsModel = this.getView().getModel("announcementDetailsModel");
+            var that = this;
+            oAnnouncementDetailsModel.setProperty("/showAnnouncementBusy", true);
+
+            var oFilter = [];
+                oFilter.push(new Filter("title", FilterOperator.Contains, searchFilter));
+				oFilter.push(new Filter("isActive", FilterOperator.EQ, true));
+                oFilter.push(new Filter("announcementType", FilterOperator.Contains, "Process"));
+                oFilter.push(new Filter("announcementStatus", FilterOperator.EQ, "PUBLISHED"));
+            
+            oDataModel.read("/Announcements", {
+                filters: oFilter,
+                urlParameters: {
+                    "$expand": "toTypes/type"
+                },
+                
+                success: function (oData) {
+                    var allAnnouncements = oData.results || [];
+
+                    // Transform the OData response to match expected format
+                    allAnnouncements = allAnnouncements.map(function (item) {
+                        return {
+                            announcementId: item.announcementId,
+                            title: item.title,
+                            description: item.description,
+                            announcementType: item.announcementType,
+                            isRead: item.isRead,
+                            isActive: item.isActive,
+                            startAnnouncement: item.startAnnouncement,
+                            endAnnouncement: item.endAnnouncement,
+                            publishedBy: item.publishedBy,
+                            publishedAt: item.publishedAt,
+                            announcementStatus: item.announcementStatus,
+                            toTypes: item.toTypes ? item.toTypes.results || item.toTypes : []
+                        };
+                    });
+                    that._processProcessAnnouncements(allAnnouncements, oAnnouncementDetailsModel);
+                    
+
+                },
+                error: function (oError) {
+                    console.error("Failed to load announcements from OData V2 API", oError);
+                    oAnnouncementDetailsModel.setProperty("/announcements", []);
+                }
+            });
+
         }
 
     });
