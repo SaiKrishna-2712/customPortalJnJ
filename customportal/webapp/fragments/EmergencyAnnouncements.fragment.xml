@@ -6,53 +6,55 @@
         id="idEmergencyAnnouncementDialog"
         showHeader="false"
         contentWidth="48rem"
+        contentHeight="23rem"
         resizable="false"
         draggable="false"
         afterClose="onAfterCloseEmergencyDialog"
     >
         <content>
             <VBox class="emergencyDialogContainer">
-
-                <!-- Header row: Title + Close -->
-                <HBox
-                    justifyContent="SpaceBetween"
-                    alignItems="Start"
-                    class="emergencyHeader"
-                >
-                    <Text
-                        text="{emergencyModel>/announcements/0/title}"
-                        class="emergencyTitle"
-                        wrapping="true"
-                    />
-
+                <HBox justifyContent="End">
                     <Button
                         icon="sap-icon://decline"
                         type="Transparent"
                         press="onDismissAllEmergencyAnnouncements"
                     />
                 </HBox>
-                <!-- Time -->
-                <Text
-                    text="{emergencyModel>/announcements/0/timeAgo}"
-                    class="emergencyTime"
-                />
+                <List
+                    items="{emergencyModel>/announcements}"
+                    showSeparators="Inner"
+                >
+                    <CustomListItem>
+                        <VBox class="sapUiSmallMarginBottom">
 
-                <!-- Description -->
-                <FormattedText
-                    htmlText="{emergencyModel>/announcements/0/description}"
-                    class="emergencyDescription"
-                />
+                            <!-- Header row -->
+                            <HBox
+                                justifyContent="SpaceBetween"
+                                alignItems="Start"
+                                class="emergencyHeader"
+                            >
+                                <Text
+                                    text="{emergencyModel>title}"
+                                    class="emergencyTitle"
+                                    wrapping="true"
+                                />
+                            </HBox>
 
-                <!-- Read more -->
-                <!-- <HBox class="sapUiSmallMarginTop">
-                    <Text text="Read more:" class="sapUiTinyMarginEnd" />
-                    <Link
-                        text="{emergencyModel>/announcements/0/link}"
-                        href="{emergencyModel>/announcements/0/link}"
-                        target="_blank"
-                        class="emergencyReadMore"
-                    />
-                </HBox> -->
+                            <!-- Time -->
+                            <Text
+                                text="{emergencyModel>timeAgo}"
+                                class="emergencyTime"
+                            />
+
+                            <!-- Description -->
+                            <FormattedText
+                                htmlText="{emergencyModel>description}"
+                                class="emergencyDescription"
+                            />
+
+                        </VBox>
+                    </CustomListItem>
+                </List>
             </VBox>
         </content>
     </Dialog>
