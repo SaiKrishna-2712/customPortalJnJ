@@ -433,20 +433,30 @@ sap.ui.define([
         },
 
         onAnnouncementSearchLive: function (oEvent) {
-            console.log(oEvent);
+            var that = this;
+            var sQuery = oEvent.getParameter("newValue");
+            if (!sQuery || !sQuery.trim()) {
+            // Search cleared → reload full list
+            that.getAnnouncementsBySearch(sQuery);
+            return;
+            }
         },
 
         onAnnouncementSearch: function (oEvent) {
-            var oDataModel = this.getOwnerComponent().getModel("announcementModel");
             var searchFilter = oEvent.getParameter("query") ;
+            searchFilter = searchFilter.toLowerCase();
+            this.getAnnouncementsBySearch(searchFilter);
+        },
+
+        getAnnouncementsBySearch: function (sQuery) {
+            var oDataModel = this.getOwnerComponent().getModel("announcementModel");
             var oAnnouncementDetailsModel = this.getView().getModel("announcementDetailsModel");
             var that = this;
             oAnnouncementDetailsModel.setProperty("/showAnnouncementBusy", true);
 
             var oFilter = [];
-                oFilter.push(new Filter("title", FilterOperator.Contains, searchFilter));
+                oFilter.push(new Filter("title", FilterOperator.Contains, sQuery));
 				oFilter.push(new Filter("isActive", FilterOperator.EQ, true));
-                oFilter.push(new Filter("announcementType", FilterOperator.Contains, "Process"));
                 oFilter.push(new Filter("announcementStatus", FilterOperator.EQ, "PUBLISHED"));
             
             oDataModel.read("/Announcements", {
@@ -475,16 +485,15 @@ sap.ui.define([
                             toTypes: item.toTypes ? item.toTypes.results || item.toTypes : []
                         };
                     });
-                    that._processProcessAnnouncements(allAnnouncements, oAnnouncementDetailsModel);
-                    
 
+                    that._processProcessAnnouncements(allAnnouncements, oAnnouncementDetailsModel);
                 },
                 error: function (oError) {
                     console.error("Failed to load announcements from OData V2 API", oError);
                     oAnnouncementDetailsModel.setProperty("/announcements", []);
+                    oAnnouncementDetailsModel.setProperty("/showAnnouncementBusy", false);
                 }
             });
-
         }
 
     });
