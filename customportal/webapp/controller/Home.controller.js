@@ -337,6 +337,8 @@ sap.ui.define([
                     return dateB - dateA;
                 });
 
+                aAnnouncements = [aAnnouncements[0]];
+                
                 oModel.setProperty("/announcements", aAnnouncements);
                 oModel.setProperty("/currentIndex", 0);
                 oModel.setProperty("/totalCount", aAnnouncements.length);
