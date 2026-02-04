@@ -17,6 +17,7 @@
     width: 100%;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .announcementTxtCss {
@@ -29,7 +30,7 @@
 /* Marquee animation - starts from right, moves to left */
 .marquee-text {
     display: inline-block;
-    animation: marquee 10s linear infinite;
+    /* animation: marquee 10s linear infinite; */
 }
 
 @keyframes marquee {
