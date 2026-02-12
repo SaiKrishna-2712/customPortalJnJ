@@ -232,7 +232,7 @@ sap.ui.define([
             // var userEmail = oUserModel.getProperty("/email");
 
             // Read announcements with expand
-            oDataModel.read("/getAnnouncementsByUser", {
+            oDataModel.read("/Announcements", {
                 urlParameters: {
                     "$expand": "toTypes/type"
                 },
