@@ -82,7 +82,10 @@
       },
       "tilesModel": {
 				"type": "sap.ui.model.json.JSONModel"
-			}
+			},
+      "userModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      }
     },
     "resources": {
       "css": [

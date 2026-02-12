@@ -326,10 +326,16 @@
                                         level="H3"
                                         class="sectionTitleCss"
                                     />
-                                    <Link
-                                        text="{i18n>viewAllText}"
-                                        press=".onViewAllPress"
-                                    />
+                                    <VBox >
+                                        <Link
+                                            text="{i18n>viewAllText}"
+                                            press=".onViewAllPress"
+                                        />
+                                        <Link
+                                            text="{i18n>ignoreAllText}"
+                                            press=".ignoreAllAnnouncements"
+                                        />
+                                    </VBox>
                                 </HBox>
                                 <ScrollContainer
                                     height="18rem"

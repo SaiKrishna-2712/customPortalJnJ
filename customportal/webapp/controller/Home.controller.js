@@ -121,6 +121,8 @@ sap.ui.define([
             });
             this.getView().setModel(oBannerModel, "bannerModel");
 
+            var oUserModel = this.getOwnerComponent().getModel("userModel");
+
             //  Fetch current user and update models
             this.getCurrentUserDetails().then((oUser) => {
                 if (oUser) {
@@ -131,12 +133,12 @@ sap.ui.define([
                     oBannerModel.setProperty("/userName", `${oUser.lastname || ""} ${oUser.firstname || ""}`);
 
                     // Create and set user model
-                    const oUserModel = new sap.ui.model.json.JSONModel({
+                    var oUserData = {
                         fullName: `${oUser.firstname || ""} ${oUser.lastname || ""}`,
                         email: oUser.email || "",
                         initials: initials
-                    });
-                    this.getView().setModel(oUserModel, "userModel");
+                    };
+                    oUserModel.setData(oUserData);
 
                     // Update avatar initials dynamically
                     const oAvatar = this.byId("idUserProfileAvtr");
@@ -226,8 +228,11 @@ sap.ui.define([
                 return;
             }
 
+            // var oUserModel = this.getOwnerComponent().getModel("userModel");
+            // var userEmail = oUserModel.getProperty("/email");
+
             // Read announcements with expand
-            oDataModel.read("/Announcements", {
+            oDataModel.read("/getAnnouncementsByUser", {
                 urlParameters: {
                     "$expand": "toTypes/type"
                 },
@@ -286,14 +291,14 @@ sap.ui.define([
                     .filter(name => name !== "");
 
                 return {
-                    id: item.announcementId,
+                    announcementId: item.announcementId,
                     title: item.title || "No Title",
                     description: item.description || "",
                     htmlDescription: that._parseRichText(item.description), // UPDATED: Store original HTML
                     date: that.formatter.timeAgo(item.startAnnouncement),
                     tags: tags,
                     announcementType: item.announcementType || "",
-                    read: item.isRead || false,
+                    isRead: item.isRead || false,
                     expanded: false,
                     previousExpanded: false,
                     startDate: item.startAnnouncement,
@@ -370,12 +375,12 @@ sap.ui.define([
             if (aAnnouncements.length === 0) return;
 
             const transformed = aAnnouncements.map(item => ({
-                id: item.announcementId,
+                announcementId: item.announcementId,
                 title: item.title,
                 description: that._parseRichText(item.description),
                 timeAgo: that.formatter.timeAgo(item.startAnnouncement)
             }));
-
+            
             this._showEmergencyDialog(transformed);
         },
 
@@ -462,11 +467,63 @@ sap.ui.define([
         },
 
         onDismissAllEmergencyAnnouncements: function () {
+
             if (this._oEmergencyDialog) {
                 this._oEmergencyDialog.close();
                 MessageToast.show("All Important Announcements dismissed");
             }
+            
+            var oEmergencyModel = this.getView().getModel("emergencyModel");
+            var aEmergencyAnnouncements = oEmergencyModel.getProperty("/announcements");
+
+            var oProcessAnnouncementsModel = this.getView().getModel("announcementsModel");
+            var aProcessAnnouncements = oProcessAnnouncementsModel.getProperty("/announcements");
+
+            // Create a lookup map of emergency announcement IDs
+            var mEmergencyIds = {};
+            aEmergencyAnnouncements.forEach(function (oItem) {
+                mEmergencyIds[oItem.announcementId] = true;
+            });
+
+            // Mark matching process announcements as read
+            aProcessAnnouncements.forEach(function (oItem) {
+                if (mEmergencyIds[oItem.announcementId]) {
+                    oItem.isRead = true;
+                }
+            });
+
+            // Update model so UI refreshes
+            oProcessAnnouncementsModel.setProperty("/announcements", aProcessAnnouncements);
+            setTimeout(() => {
+                this._updateAnnouncementStyles();
+            }, 100);
+
         },
+
+        ignoreAllAnnouncements: function () {
+            var oUserModel = this.getOwnerComponent().getModel("userModel");
+            var oAnnouncementModel = this.getOwnerComponent().getModel("announcementModel");
+            // var userId = oUserModel.getProperty("/email");
+            var userEmail = oUserModel.getProperty("/email");
+
+            var oPayload = {
+                "userEmail" : userEmail,
+                "ignoreAll" : true
+            };
+
+            oAnnouncementModel.create("/ignoredStatus", oPayload, {
+                async: true,
+                success: function (oData) {
+
+                    console.log(oData);
+                },
+                error: function (oError) {
+                    console.log(oError);
+                }
+            });
+
+        },
+
 
         onAfterCloseEmergencyDialog: function () {
             const oModel = this.getView().getModel("emergencyModel");
@@ -1006,6 +1063,7 @@ sap.ui.define([
          * Announcement press handler
          */
         onAnnouncementPress: function (oEvent) {
+            var that = this;
             const oItem = oEvent.getSource();
             const oCtx = oItem.getBindingContext("announcementsModel");
             const sPath = oCtx.getPath();
@@ -1015,15 +1073,42 @@ sap.ui.define([
             const clicked = oModel.getProperty(sPath);
 
             clicked.expanded = !clicked.expanded;
+            var announcementId = clicked.announcementId;
             if (clicked.expanded) {
-                clicked.read = true;
+                clicked.isRead = true;
                 clicked.previousExpanded = false;
+                that._updateAnnouncementReadStatus(announcementId);
             } else {
                 clicked.previousExpanded = true;
             }
 
             oModel.setProperty("/announcements", announcements);
+
             this._updateAnnouncementStyles();
+        },
+
+        _updateAnnouncementReadStatus: function (announcementId) {
+            var oUserModel = this.getOwnerComponent().getModel("userModel");
+            var userEmail = oUserModel.getProperty("/email");
+            var oAnnouncementModel = this.getOwnerComponent().getModel("announcementModel");
+            // var userId = oUserModel.getProperty("/email");
+            var userId = "40a9d794-7ee5-48c2-a04b-234e109e5f0f";
+
+            var oPayload = {
+                "announcementId" : announcementId,
+                "userEmail" : userEmail,
+                "isRead" : true
+            };
+
+            oAnnouncementModel.create("/updateReadStatus", oPayload, {
+                async: true,
+                success: function (oData) {
+                    console.log(oData);
+                },
+                error: function (oError) {
+                    console.log(oError);
+                }
+            });
         },
 
         /**
@@ -1050,14 +1135,14 @@ sap.ui.define([
                 // Update line styles
                 oLineVBox.removeStyleClass("lineBlue");
                 oLineVBox.removeStyleClass("lineLightGray");
-                oLineVBox.addStyleClass(data.read ? "lineLightGray" : "lineBlue");
+                oLineVBox.addStyleClass(data.isRead ? "lineLightGray" : "lineBlue");
 
                 // Recursive style application for nested elements
                 const applyStyle = ctrl => {
                     if (!ctrl) return;
                     ctrl.removeStyleClass("announcementTextUnread");
                     ctrl.removeStyleClass("announcementTextRead");
-                    ctrl.addStyleClass(data.read ? "announcementTextRead" : "announcementTextUnread");
+                    ctrl.addStyleClass(data.isRead ? "announcementTextRead" : "announcementTextUnread");
 
                     if (ctrl.getItems && typeof ctrl.getItems === "function") {
                         ctrl.getItems().forEach(applyStyle);

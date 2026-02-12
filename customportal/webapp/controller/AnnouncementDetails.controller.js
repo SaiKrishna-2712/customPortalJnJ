@@ -128,7 +128,7 @@ sap.ui.define([
                     date: that.formatter.timeAgo(item.startAnnouncement),
                     tags: tags,
                     announcementType: item.announcementType || "",
-                    read: item.isRead || false,
+                    isRead: item.isRead || false,
                     expanded: false,
                     previousExpanded: false,
                     startDate: item.startAnnouncement,
@@ -319,7 +319,7 @@ sap.ui.define([
             // Toggle expanded state
             clicked.expanded = !clicked.expanded;
             if (clicked.expanded) {
-                clicked.read = true;
+                clicked.isRead = true;
                 clicked.previousExpanded = false;
             } else {
                 clicked.previousExpanded = true;
@@ -353,14 +353,14 @@ sap.ui.define([
                 // Update line styles
                 oLineVBox.removeStyleClass("lineBlue");
                 oLineVBox.removeStyleClass("lineLightGray");
-                oLineVBox.addStyleClass(data.read ? "lineLightGray" : "lineBlue");
+                oLineVBox.addStyleClass(data.isRead ? "lineLightGray" : "lineBlue");
 
                 // Recursive style application for nested elements
                 const applyStyle = ctrl => {
                     if (!ctrl) return;
                     ctrl.removeStyleClass("announcementTextUnread");
                     ctrl.removeStyleClass("announcementTextRead");
-                    ctrl.addStyleClass(data.read ? "announcementTextRead" : "announcementTextUnread");
+                    ctrl.addStyleClass(data.isRead ? "announcementTextRead" : "announcementTextUnread");
 
                     if (ctrl.getItems && typeof ctrl.getItems === "function") {
                         ctrl.getItems().forEach(applyStyle);
