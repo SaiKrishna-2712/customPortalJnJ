@@ -85,6 +85,18 @@
 			},
       "userModel": {
         "type": "sap.ui.model.json.JSONModel"
+      },
+      "bannerModel":{
+        "type": "sap.ui.model.json.JSONModel"
+      },
+      "processAnnouncementModel":{
+        "type": "sap.ui.model.json.JSONModel"
+      },
+      "globalAnnouncementModel":{
+        "type": "sap.ui.model.json.JSONModel"
+      },
+      "emergencyAnnouncementModel":{
+        "type": "sap.ui.model.json.JSONModel"
       }
     },
     "resources": {
@@ -116,7 +128,7 @@
         },
         {
           "name": "RouteAnnouncementDetails",
-          "pattern": "announcements",
+          "pattern": "announcementDetails",
           "target": [
             "TargetAnnouncementDetails"
           ]

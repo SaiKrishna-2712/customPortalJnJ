@@ -12,6 +12,8 @@ sap.ui.define([
     return BaseController.extend("com.incture.customportal.controller.AnnouncementDetails", {
 
         onInit: function () {
+
+            var that = this;
             // Initialize filter model
             var oFilterModel = new JSONModel({
                 general: false,
@@ -27,29 +29,24 @@ sap.ui.define([
             });
             this.getView().setModel(oAnnouncementDetailsModel, "announcementDetailsModel");
 
-            // Load announcements using OData V2
-            this._loadAnnouncementsODataV2();
+            this.fetchAnnouncementsFlag = false;
+            this.getCurrentUserDetails(this);
 
-            // Fetch current user and update avatar
-            this.getCurrentUserDetails().then((oUser) => {
-                if (oUser) {
-                    const initials = `${oUser.firstname?.[0] || ""}${oUser.lastname?.[0] || ""}`.toUpperCase();
+            this.getOwnerComponent().getRouter().getRoute("RouteAnnouncementDetails").attachPatternMatched(this._onAnnouncementRouteMatched, this);
 
-                    const oAvatar = this.byId("idAnnouncementUserAvtr");
-                    if (oAvatar) {
-                        oAvatar.setInitials(initials);
-                    }
-
-                    // Create and set user model
-                    const oUserModel = new JSONModel({
-                        fullName: `${oUser.firstname || ""} ${oUser.lastname || ""}`,
-                        email: oUser.email || "",
-                        initials: initials
-                    });
-                    this.getView().setModel(oUserModel, "userModel");
-                }
-            });
         },
+
+        _onAnnouncementRouteMatched: function (oEvent) {
+            if(this.fetchAnnouncementsFlag) {
+                this._loadAnnouncementsODataV2();
+            }
+        },
+
+        triggerUserDependentFunctions: function () {
+        // SINGLE API CALL FOR ALL ANNOUNCEMENTS (Emergency, Global, Process)
+            this._loadAnnouncementsODataV2();
+        },
+
 
         /**
          * Load announcements using OData V2 (same approach as App.controller.js)
@@ -71,10 +68,14 @@ sap.ui.define([
                 return;
             }
 
+            var oUserModel = this.getOwnerComponent().getModel("userModel");
+            var userEmail = oUserModel.getProperty("/email");
+
             // Read announcements with expand (OData V2 syntax)
-            oDataModel.read("/Announcements", {
+            oDataModel.read("/getAnnouncementsByUser", {
                 urlParameters: {
-                    "$expand": "toTypes/type"
+                    "userEmail": userEmail,
+                    "announcementStatus": "PUBLISHED"
                 },
                 success: function (oData) {
                     var allAnnouncements = oData.results || [];
@@ -98,7 +99,7 @@ sap.ui.define([
                     });
 
                     // Process announcements
-                    that._processProcessAnnouncements(allAnnouncements, oAnnouncementDetailsModel);
+                    that._processProcessAnnouncements(allAnnouncements, oAnnouncementDetailsModel, that);
                     that._processGlobalAnnouncements(allAnnouncements, oGlobalAnnouncementDetailModel);
                 },
                 error: function (oError) {
@@ -108,58 +109,10 @@ sap.ui.define([
             });
         },
 
-        /**
-         * Process PROCESS type announcements (from App.controller.js)
-         */
-        _processProcessAnnouncements: function (allAnnouncements, oModel) {
-            var that = this;
-
-            let aAnnouncements = allAnnouncements.filter(item => item.isActive === true && that._hasAnnouncementType(item.announcementType, "Process") && item.announcementStatus === "PUBLISHED");
-
-            aAnnouncements = aAnnouncements.map(item => {
-                const tags = (item.toTypes || [])
-                    .map(typeObj => typeObj.type?.name || "")
-                    .filter(name => name !== "");
-
-                return {
-                    id: item.announcementId,
-                    title: item.title || "No Title",
-                    description: that._parseRichText(item.description),
-                    date: that.formatter.timeAgo(item.startAnnouncement),
-                    tags: tags,
-                    announcementType: item.announcementType || "",
-                    isRead: item.isRead || false,
-                    expanded: false,
-                    previousExpanded: false,
-                    startDate: item.startAnnouncement,
-                    endDate: item.endAnnouncement,
-                    isActive: item.isActive
-                };
-            });
-
-            // Sort by start date (newest first)
-            aAnnouncements.sort((a, b) => {
-                var dateA = this._parseODataDate(a.startDate);
-                var dateB = this._parseODataDate(b.startDate);
-                return dateB - dateA;
-            });
-
-            oModel.setProperty("/announcements", aAnnouncements);
-
-            setTimeout(() => {
-                this._updateAnnouncementStyles();
-            }, 100);
-
-            console.log("Loaded " + aAnnouncements.length + " active Process announcements");
-        },
-
         _processGlobalAnnouncements: function (allAnnouncements, oModel) {
             // UPDATED: Add status filter for PUBLISHED
             let aAnnouncements = allAnnouncements.filter(item => {
-                return item.isActive !== false &&
-                    !this._isExpired(item.endAnnouncement) &&
-                    this._hasAnnouncementType(item.announcementType, "Planned Scheduled") &&
-                    item.announcementStatus === "PUBLISHED";
+                return this._hasAnnouncementType(item.announcementType, "Banner")
             });
 
             if (aAnnouncements.length > 0) {
@@ -308,6 +261,7 @@ sap.ui.define([
         },
 
         onAnnouncementItemPress: function (oEvent) {
+            var that = this;
             const oItem = oEvent.getSource();
             const oCtx = oItem.getBindingContext("announcementDetailsModel");
             const sPath = oCtx.getPath();
@@ -317,15 +271,15 @@ sap.ui.define([
             const clicked = oModel.getProperty(sPath);
 
             // Toggle expanded state
-            clicked.expanded = !clicked.expanded;
-            if (clicked.expanded) {
-                clicked.isRead = true;
-                clicked.previousExpanded = false;
-            } else {
-                clicked.previousExpanded = true;
-            }
+            var bExpanded = !clicked.expanded;
+            var announcementId = clicked.announcementId;
 
-            oModel.setProperty("/announcements", announcements);
+            if(!clicked.isRead){
+                oModel.setProperty(sPath + "/isRead", true);
+                that._updateAnnouncementReadStatus(announcementId);
+            }
+            
+            oModel.setProperty(sPath + "/expanded", bExpanded);
             this._updateAnnouncementStyles();
         },
 
@@ -486,7 +440,7 @@ sap.ui.define([
                         };
                     });
 
-                    that._processProcessAnnouncements(allAnnouncements, oAnnouncementDetailsModel);
+                    that._processProcessAnnouncements(allAnnouncements, oAnnouncementDetailsModel, that);
                 },
                 error: function (oError) {
                     console.error("Failed to load announcements from OData V2 API", oError);

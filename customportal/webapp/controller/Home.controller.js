@@ -7,8 +7,10 @@ sap.ui.define([
     "sap/m/TileContent",
     "sap/m/ImageContent",
     "sap/ui/layout/GridData",
-    "com/incture/customportal/util/formatter"
-    ], function (BaseController, Fragment, MessageToast, JSONModel, GenericTile, TileContent, ImageContent, GridData, formatter) {
+    "com/incture/customportal/util/formatter",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator"
+    ], function (BaseController, Fragment, MessageToast, JSONModel, GenericTile, TileContent, ImageContent, GridData, formatter, Filter, FilterOperator) {
         "use strict";
     return BaseController.extend("com.incture.customportal.controller.Home", {
         formatter: formatter,
@@ -98,13 +100,24 @@ sap.ui.define([
             };
             this.getOwnerComponent().getModel("tilesModel").setData(oTilesData);
             
+            // Initialize banner model with responsive data
+            var oBannerModel = this.getOwnerComponent().getModel("bannerModel");
+
+            var oUserModel = this.getOwnerComponent().getModel("userModel");
+
+            this.fetchAnnouncementsFlag = false;
+
+            this.getCurrentUserDetails(this);
+
+            this.getOwnerComponent().getRouter().getRoute("RouteHome").attachPatternMatched(this._onRouteHomeMatched, this);
+
+            this._setDateAndTemp(oBannerModel);
+
             this.getQuickLinks();
 
             // Create tiles programmatically
             this._createTiles();
 
-            // SINGLE API CALL FOR ALL ANNOUNCEMENTS (Emergency, Global, Process)
-            this._fetchAllAnnouncements();
 
             console.log("Tiles Model:", this.getOwnerComponent().getModel("tilesModel"));
 
@@ -114,47 +127,17 @@ sap.ui.define([
             // Initialize knowledge articles
             this._initializeKnowledgeArticles();
 
-            // Initialize banner model with responsive data
-            var oBannerModel = new sap.ui.model.json.JSONModel({
-                dateTemp: "",
-                userName: ""
-            });
-            this.getView().setModel(oBannerModel, "bannerModel");
-
-            var oUserModel = this.getOwnerComponent().getModel("userModel");
-
-            //  Fetch current user and update models
-            this.getCurrentUserDetails().then((oUser) => {
-                if (oUser) {
-                    // Create initials
-                    const initials = `${oUser.firstname?.[0] || ""}${oUser.lastname?.[0] || ""}`.toUpperCase();
-
-                    // Update banner
-                    oBannerModel.setProperty("/userName", `${oUser.lastname || ""} ${oUser.firstname || ""}`);
-
-                    // Create and set user model
-                    var oUserData = {
-                        fullName: `${oUser.firstname || ""} ${oUser.lastname || ""}`,
-                        email: oUser.email || "",
-                        initials: initials
-                    };
-                    oUserModel.setData(oUserData);
-
-                    // Update avatar initials dynamically
-                    const oAvatar = this.byId("idUserProfileAvtr");
-                    if (oAvatar) {
-                        oAvatar.setInitials(initials);
-                    }
-                }
-            });
-
-            this.getView().setModel(oBannerModel, "bannerModel");
-
-            this._setDateAndTemp(oBannerModel);
-
             // Handle window resize for responsive behavior
             this._attachResizeHandler();
+
         },
+
+        _onRouteHomeMatched: function (oEvent) {
+            if(this.fetchAnnouncementsFlag) {
+                this._fetchAllAnnouncements();
+            }
+        },
+
 
 
 
@@ -164,8 +147,8 @@ sap.ui.define([
             var oQuickLinksDataModel = new sap.ui.model.json.JSONModel();
             this.getView().setModel(oQuickLinksDataModel, "quickLinksDataModel");
             oQuickLinksDataModel.setData({
-                        links: that._getFallbackQuickLinks()
-                    });
+                links: that._getFallbackQuickLinks()
+            });
 
 
             // oQuickLinksModel.read("/QuickLinks", {
@@ -178,6 +161,11 @@ sap.ui.define([
             //     }
             // });
 
+        },
+
+        triggerUserDependentFunctions: function () {
+        // SINGLE API CALL FOR ALL ANNOUNCEMENTS (Emergency, Global, Process)
+            this._fetchAllAnnouncements();
         },
 
         _getFallbackQuickLinks: function () {
@@ -228,13 +216,17 @@ sap.ui.define([
                 return;
             }
 
-            // var oUserModel = this.getOwnerComponent().getModel("userModel");
-            // var userEmail = oUserModel.getProperty("/email");
+            var oUserModel = this.getOwnerComponent().getModel("userModel");
+            var userEmail = oUserModel.getProperty("/email");
 
             // Read announcements with expand
-            oDataModel.read("/Announcements", {
+            var oFilter = [];
+                oFilter.push(new Filter("announcementStatus", FilterOperator.EQ, "PUBLISHED"));
+
+            oDataModel.read("/getAnnouncementsByUser", {
                 urlParameters: {
-                    "$expand": "toTypes/type"
+                    "userEmail": userEmail,
+                    "announcementStatus": "PUBLISHED"
                 },
                 success: function (oData) {
                     var allAnnouncements = oData.results || [];
@@ -258,7 +250,7 @@ sap.ui.define([
                     });
 
                     // Process all three types
-                    that._processProcessAnnouncements(allAnnouncements, oProcessAnnouncementsModel);
+                    that._processProcessAnnouncements(allAnnouncements, oProcessAnnouncementsModel, that);
                     that._processGlobalAnnouncements(allAnnouncements, oGlobalAnnouncementModel);
                     that._processEmergencyAnnouncements(allAnnouncements);
                 },
@@ -272,56 +264,6 @@ sap.ui.define([
             });
         },
 
-        /**
-         * Process PROCESS type announcements
-         */
-        _processProcessAnnouncements: function (allAnnouncements, oModel) {
-            var that = this;
-
-            // UPDATED: Add status filter for PUBLISHED
-            let aAnnouncements = allAnnouncements.filter(item =>
-                item.isActive === true && 
-                that._hasAnnouncementType(item.announcementType, "Process") &&
-                item.announcementStatus === "PUBLISHED"
-            );
-
-            aAnnouncements = aAnnouncements.map(item => {
-                const tags = (item.toTypes || [])
-                    .map(typeObj => typeObj.type?.name || "")
-                    .filter(name => name !== "");
-
-                return {
-                    announcementId: item.announcementId,
-                    title: item.title || "No Title",
-                    description: item.description || "",
-                    htmlDescription: that._parseRichText(item.description), // UPDATED: Store original HTML
-                    date: that.formatter.timeAgo(item.startAnnouncement),
-                    tags: tags,
-                    announcementType: item.announcementType || "",
-                    isRead: item.isRead || false,
-                    expanded: false,
-                    previousExpanded: false,
-                    startDate: item.startAnnouncement,
-                    endDate: item.endAnnouncement,
-                    isActive: item.isActive
-                };
-            });
-
-            // Sort by start date (newest first)
-            aAnnouncements.sort((a, b) => {
-                var dateA = this._parseODataDate(a.startDate);
-                var dateB = this._parseODataDate(b.startDate);
-                return dateB - dateA;
-            });
-
-            oModel.setProperty("/announcements", aAnnouncements);
-
-            setTimeout(() => {
-                this._updateAnnouncementStyles();
-            }, 100);
-
-            console.log("Loaded " + aAnnouncements.length + " active Process announcements");
-        },
 
         /**
          * Process GLOBAL type announcements
@@ -329,10 +271,7 @@ sap.ui.define([
         _processGlobalAnnouncements: function (allAnnouncements, oModel) {
             // UPDATED: Add status filter for PUBLISHED
             let aAnnouncements = allAnnouncements.filter(item => {
-                return item.isActive !== false &&
-                    !this._isExpired(item.endAnnouncement) &&
-                    this._hasAnnouncementType(item.announcementType, "Planned Scheduled") &&
-                    item.announcementStatus === "PUBLISHED";
+                return this._hasAnnouncementType(item.announcementType, "Banner")
             });
 
             if (aAnnouncements.length > 0) {
@@ -367,9 +306,8 @@ sap.ui.define([
 
             // UPDATED: Add status filter for PUBLISHED
             let aAnnouncements = allAnnouncements.filter(item =>
-                item.isActive !== false &&
-                this._hasAnnouncementType(item.announcementType, "Important Announcement") &&
-                item.announcementStatus === "PUBLISHED"
+                item.isRead !== true &&
+                this._hasAnnouncementType(item.announcementType, "Sidebar (Popup)")
             );
 
             if (aAnnouncements.length === 0) return;
@@ -467,6 +405,7 @@ sap.ui.define([
         },
 
         onDismissAllEmergencyAnnouncements: function () {
+            var that = this;
 
             if (this._oEmergencyDialog) {
                 this._oEmergencyDialog.close();
@@ -489,6 +428,7 @@ sap.ui.define([
             aProcessAnnouncements.forEach(function (oItem) {
                 if (mEmergencyIds[oItem.announcementId]) {
                     oItem.isRead = true;
+                    that._updateAnnouncementReadStatus(oItem.announcementId);
                 }
             });
 
@@ -965,6 +905,7 @@ sap.ui.define([
             this._iframeLoadTimeout = setTimeout(function () {
                 if (!bLoaded) {
                     console.log("Iframe timeout for: " + sUrl);
+                    oHtml.setContent("");
                     MessageToast.show("This site cannot be embedded. Opening in new tab...");
                     that._openInNewTab(sUrl, sTitle);
                 }
@@ -1072,43 +1013,17 @@ sap.ui.define([
             const announcements = oModel.getProperty("/announcements");
             const clicked = oModel.getProperty(sPath);
 
-            clicked.expanded = !clicked.expanded;
+            var bExpanded = !clicked.expanded;
             var announcementId = clicked.announcementId;
-            if (clicked.expanded) {
-                clicked.isRead = true;
-                clicked.previousExpanded = false;
-                that._updateAnnouncementReadStatus(announcementId);
-            } else {
-                clicked.previousExpanded = true;
-            }
 
-            oModel.setProperty("/announcements", announcements);
+            if(!clicked.isRead){
+                oModel.setProperty(sPath + "/isRead", true);
+                that._updateAnnouncementReadStatus(announcementId);
+            }
+            
+            oModel.setProperty(sPath + "/expanded", bExpanded);
 
             this._updateAnnouncementStyles();
-        },
-
-        _updateAnnouncementReadStatus: function (announcementId) {
-            var oUserModel = this.getOwnerComponent().getModel("userModel");
-            var userEmail = oUserModel.getProperty("/email");
-            var oAnnouncementModel = this.getOwnerComponent().getModel("announcementModel");
-            // var userId = oUserModel.getProperty("/email");
-            var userId = "40a9d794-7ee5-48c2-a04b-234e109e5f0f";
-
-            var oPayload = {
-                "announcementId" : announcementId,
-                "userEmail" : userEmail,
-                "isRead" : true
-            };
-
-            oAnnouncementModel.create("/updateReadStatus", oPayload, {
-                async: true,
-                success: function (oData) {
-                    console.log(oData);
-                },
-                error: function (oError) {
-                    console.log(oError);
-                }
-            });
         },
 
         /**

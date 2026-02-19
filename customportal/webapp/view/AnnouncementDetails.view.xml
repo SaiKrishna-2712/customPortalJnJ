@@ -59,7 +59,7 @@
                     <f:profile>
                         <f:Avatar
                             id="idAnnouncementUserAvtr"
-                            initials="JD"
+                            initials="{userModel>/initials}"
                             displaySize="XS"
                             backgroundColor="Accent1"
                             tooltip="{i18n>userProfileTooltip}"
