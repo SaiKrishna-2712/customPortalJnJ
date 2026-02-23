@@ -4,6 +4,7 @@
 >
     <Dialog
         id="idEmergencyAnnouncementDialog"
+        class="emergencyDialogSharp"
         showHeader="false"
         contentWidth="48rem"
         contentHeight="23rem"
@@ -11,15 +12,41 @@
         draggable="false"
         afterClose="onAfterCloseEmergencyDialog"
     >
-        <content>
-            <VBox class="emergencyDialogContainer">
-                <HBox justifyContent="End">
+
+    <customHeader>
+            <Bar>
+                <contentLeft>
+                    <HBox alignItems="Center" class="sapUiTinyMarginBegin">
+                        <core:Icon
+                            src="sap-icon://alert"
+                            color="#BB0000"
+                            class="sapUiTinyMarginEnd"
+                        />
+                        <Title
+                            text="Important Announcements ({= ${emergencyModel>/announcements}.length })"
+                            level="H3"
+                        />
+                    </HBox>
+                </contentLeft>
+
+                <contentRight>
                     <Button
                         icon="sap-icon://decline"
                         type="Transparent"
                         press="onDismissAllEmergencyAnnouncements"
                     />
-                </HBox>
+                </contentRight>
+            </Bar>
+        </customHeader>
+        <content>
+            <VBox class="emergencyDialogContainer">
+                <!-- <HBox justifyContent="End">
+                    <Button
+                        icon="sap-icon://decline"
+                        type="Transparent"
+                        press="onDismissAllEmergencyAnnouncements"
+                    />
+                </HBox> -->
                 <List
                     items="{emergencyModel>/announcements}"
                     showSeparators="Inner"
@@ -49,7 +76,7 @@
                             <!-- Description -->
                             <FormattedText
                                 htmlText="{emergencyModel>description}"
-                                class="emergencyDescription"
+                                class="sapUiTinyMarginBegin"
                             />
 
                         </VBox>

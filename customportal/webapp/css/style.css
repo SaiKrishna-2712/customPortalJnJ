@@ -246,14 +246,33 @@ body>#faqBtnUI5 {
   padding: 0;
 }
 
-.announcementTextUnread {
+/* READ */
+.announcementItemRead .announcementTextUnread,
+.announcementItemRead .announcementTextUnreadTitle {
+    color: #6a6d70;
+    font-weight: normal;
+}
+.announcementItemRead .announcementTextUnread,
+.announcementItemRead .announcementTextUnreadTitle {
   font-weight: normal !important;
   color: black !important;
+}
+
+.announcementTextUnreadTitle {
+  font-weight: 800 !important;
+  color: black !important;
+  font-size: medium;
 }
 
 .announcementTextRead {
   font-weight: normal !important;
   color: #9f9e9e !important;
+}
+
+.announcementTextReadTitle {
+  font-weight: 800 !important;
+  color: #9f9e9e !important;
+  font-size: medium;
 }
 
 /* Remove all rounded corners for Emergency Announcement Dialog */
@@ -292,19 +311,115 @@ body>#faqBtnUI5 {
   margin-bottom: 0.75rem;
 }
 
-/* Description */
-.emergencyDescription {
-  font-weight: 600;
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-/* Read more link */
-.emergencyReadMore {
-  color: #d00000;
-  font-weight: 500;
-}
-
 .announcementTagCss .sapMObjStatusText {
     color: #ffffff !important;
 }
+
+/* Remove dialog border radius */
+.emergencyDialogSharp .sapMDialogSection {
+    border-radius: 4px !important;   /* make it slightly sharp */
+}
+
+/* Reduce header radius */
+.emergencyDialogSharp .sapMBar {
+    border-top-left-radius: 4px !important;
+    border-top-right-radius: 4px !important;
+}
+
+/* Optional: make it fully sharp */
+.emergencyDialogSharp .sapMDialog {
+    border-radius: 4px !important;
+}
+
+.announcementCard {
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.viewAllLink {
+    font-size: 0.85rem;
+    color: #eb1504 !important;
+}
+
+.announcementHeaderBorder {
+    border-bottom: 1px solid #d9d9d9;   /* light grey */
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Base style */
+.filterTabBtn .sapMBtnInner {
+    border: 1px solid #d1d1d1;
+    border-radius: 20px;
+    background: transparent;
+    color: #000;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Remove SAPUI5 focus layer */
+.filterTabBtn .sapMBtnFocusDiv {
+    display: none !important;
+}
+
+/* Remove default focus styles */
+.filterTabBtn.sapMBtn:focus,
+.filterTabBtn.sapMBtn.sapMBtnFocused {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Hover */
+.filterTabBtn:hover .sapMBtnInner {
+    color: #eb1504 !important;
+    border-color: #eb1504 !important;
+}
+
+/* Selected tab */
+.selectedTab .sapMBtnInner {
+    border: 1px solid #eb1504 !important;
+    color: #eb1504 !important;
+    background: transparent !important;
+}
+
+/* Remove active press shadow */
+.filterTabBtn .sapMBtnInner.sapMBtnActive {
+    box-shadow: none !important;
+}
+
+/* Ignore All Link - default */
+.ignoreAllLink {
+    font-size: 0.875rem;          /* slightly smaller */
+    font-weight: 500;
+    color: #000000 !important;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Hover effect */
+.ignoreAllLink:hover {
+    color: #eb1504;               /* red on hover */
+    text-decoration: none;
+}
+
+/* Remove default UI5 focus outline */
+.ignoreAllLink:focus {
+    outline: none;
+}
+
+/* Remove UI5 active state blue color */
+.ignoreAllLink.sapMLnk:active {
+    color: #eb1504;
+}
+
+.announcementIconUnread {
+    color: #eb1504 !important;
+    margin-inline-end: 0.5rem;
+}
+
+.announcementIconRead {
+    margin-inline-end: 0.5rem;
+    color: #9f9e9e !important;
+}
+

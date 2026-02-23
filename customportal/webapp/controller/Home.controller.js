@@ -440,7 +440,8 @@ sap.ui.define([
 
         },
 
-        ignoreAllAnnouncements: function () {
+        onIgnoreAllPress: function () {
+            var that = this;
             var oUserModel = this.getOwnerComponent().getModel("userModel");
             var oAnnouncementModel = this.getOwnerComponent().getModel("announcementModel");
             // var userId = oUserModel.getProperty("/email");
@@ -454,8 +455,7 @@ sap.ui.define([
             oAnnouncementModel.create("/ignoredStatus", oPayload, {
                 async: true,
                 success: function (oData) {
-
-                    console.log(oData);
+                    that.updateIgnoredAnnouncements();
                 },
                 error: function (oError) {
                     console.log(oError);
@@ -463,6 +463,23 @@ sap.ui.define([
             });
 
         },
+
+        updateIgnoredAnnouncements: function () {
+            var that = this;
+            var oProcessAnnouncementsModel = this.getView().getModel("announcementsModel");
+            var aProcessAnnouncements = oProcessAnnouncementsModel.getProperty("/announcements");
+
+             aProcessAnnouncements.forEach(function (oItem) {
+                    oItem.isRead = true;
+            });
+
+            // Update model so UI refreshes
+            oProcessAnnouncementsModel.setProperty("/announcements", aProcessAnnouncements);
+            setTimeout(() => {
+                that._updateAnnouncementStyles();
+            }, 100);
+        },
+
 
 
         onAfterCloseEmergencyDialog: function () {
@@ -1043,30 +1060,22 @@ sap.ui.define([
                 const data = oModel.getProperty(oCtx.getPath());
                 if (!data) return;
 
-                const oMainHBox = oItem.getContent()[0];
-                const oContainerBox = oMainHBox.getItems()[1]; // content VBox
-                const oLineVBox = oMainHBox.getItems()[0].getItems()[0]; // vertical line
+                // Remove old classes
+                oItem.removeStyleClass("announcementItemRead");
+                oItem.removeStyleClass("announcementItemUnread");
 
-                // Update line styles
+                // Add new class
+                oItem.addStyleClass(
+                    data.isRead ? "announcementItemRead" : "announcementItemUnread"
+                );
+
+                // Update vertical line only
+                const oMainHBox = oItem.getContent()[0];
+                const oLineVBox = oMainHBox.getItems()[0].getItems()[0];
+
                 oLineVBox.removeStyleClass("lineBlue");
                 oLineVBox.removeStyleClass("lineLightGray");
                 oLineVBox.addStyleClass(data.isRead ? "lineLightGray" : "lineBlue");
-
-                // Recursive style application for nested elements
-                const applyStyle = ctrl => {
-                    if (!ctrl) return;
-                    ctrl.removeStyleClass("announcementTextUnread");
-                    ctrl.removeStyleClass("announcementTextRead");
-                    ctrl.addStyleClass(data.isRead ? "announcementTextRead" : "announcementTextUnread");
-
-                    if (ctrl.getItems && typeof ctrl.getItems === "function") {
-                        ctrl.getItems().forEach(applyStyle);
-                    }
-                };
-
-                if (oContainerBox && oContainerBox.getItems) {
-                    oContainerBox.getItems().forEach(applyStyle);
-                }
             });
         },
 
@@ -1081,7 +1090,39 @@ sap.ui.define([
         onViewAllArticles: function () {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             oRouter.navTo("RouteKnowledgeArticleDetails");
+        },
+
+        onPressAllAnnouncement: function (oEvent) {
+            this._setSelectedFilter(oEvent.getSource());
+            console.log(oEvent);
+        },
+
+        onPressUnreadAnnouncement: function (oEvent) {
+            this._setSelectedFilter(oEvent.getSource());
+            console.log(oEvent);
+        },
+
+        onPressImpAnnouncement: function (oEvent) {
+            this._setSelectedFilter(oEvent.getSource());
+            console.log(oEvent);
+        },
+
+        _setSelectedFilter: function (oSelectedButton) {
+
+            var aButtons = this.byId("idMainPg")
+                .findAggregatedObjects(true, function (oControl) {
+                    return oControl.hasStyleClass && oControl.hasStyleClass("filterTabBtn");
+                });
+
+            aButtons.forEach(function (oBtn) {
+                oBtn.removeStyleClass("selectedTab");
+            });
+
+            oSelectedButton.addStyleClass("selectedTab");
+
+            oSelectedButton
         }
+    
 
     });
 })

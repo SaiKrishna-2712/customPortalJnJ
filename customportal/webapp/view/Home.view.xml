@@ -135,7 +135,7 @@
                         <!-- Left Section  -->
                         <VBox width="100%">
                             <layoutData>
-                                <l:GridData span="L9 M12 S12" />
+                                <l:GridData span="L8 M12 S12" />
                             </layoutData>
 
                             <!-- Applications Section -->
@@ -231,7 +231,7 @@
                                         target="_blank"
                                         text="{i18n>viewAllText}"
                                         href="https://jnjfinance.service-now.com/fsp?id=kb_view2&amp;utm_source=VITAL&amp;utm_medium=navigation&amp;utm_campaign=homepage"
-                                        class="sapUiSmallMarginTop"
+                                        class="viewAllLink"
                                     />
                                 </FlexBox>
 
@@ -309,15 +309,64 @@
                         <!-- Right Section (30%) -->
                         <VBox width="100%">
                             <layoutData>
-                                <l:GridData span="L3 M12 S12" />
+                                <l:GridData span="L4 M12 S12" />
                             </layoutData>
 
                             <!-- Announcements Section -->
                             <VBox
-                                class="sapUiMediumMarginBottom sapUiContentPadding"
+                                class="sapUiMediumMarginBottom sapUiContentPadding announcementCard"
                                 backgroundDesign="Solid"
                             >
-                                <HBox
+                                <!-- Header -->
+                                <HBox justifyContent="SpaceBetween" alignItems="Center" class= "announcementHeaderBorder" >
+                                    <core:Icon
+                                        src="sap-icon://marketing-campaign"
+                                        color="#263841ff"
+                                        backgroundColor="#9d9bacff"
+                                        activeBackgroundColor="#9d9bacff"
+                                        activeColor="#263841ff"
+                                        class="sapUiTinyMarginEnd"
+                                    />
+                                    <Title
+                                        text="Announcements"
+                                        level="H3"
+                                        class="sectionTitleCss"
+                                    />
+                                    <Link
+                                        text="View all"
+                                        press="onViewAllPress"
+                                        class="viewAllLink"
+                                    />
+                                </HBox>
+
+                                <!-- Filter Tabs -->
+                                <HBox class="filterTabsBar" >
+                                    <Button
+                                        text="{announcementsModel>/sAllBtnTxt}"
+                                        press="onPressAllAnnouncement"
+                                        type="Transparent"
+                                        class="sapUiTinyMarginBeginEnd filterTabBtn selectedTab"
+                                    />
+                                    <Button
+                                        text="{announcementsModel>/sUnreadBtnTxt}"
+                                        press="onPressUnreadAnnouncement"
+                                        type="Transparent"
+                                        class="sapUiTinyMarginBeginEnd filterTabBtn"
+                                    />
+                                    <Button
+                                        text="{announcementsModel>/sImportantBtnTxt}"
+                                        press="onPressImpAnnouncement"
+                                        type="Transparent"
+                                        class="sapUiTinyMarginBeginEnd filterTabBtn"
+                                    />
+                                    <ToolbarSpacer />
+                                    <Link
+                                        text="Ignore All"
+                                        press="onIgnoreAllPress"
+                                        class="sapUiTinyMarginBeginEnd sapUiTinyMarginTop ignoreAllLink"
+                                    />
+                                </HBox>
+                                <!-- <HBox
                                     justifyContent="SpaceBetween"
                                     alignItems="Center"
                                 >
@@ -336,7 +385,7 @@
                                             press=".ignoreAllAnnouncements"
                                         />
                                     </VBox>
-                                </HBox>
+                                </HBox> -->
                                 <ScrollContainer
                                     height="18rem"
                                     width="100%"
@@ -376,10 +425,24 @@
                                                     renderType="Bare"
                                                     class="sapUiTinyMarginStart"
                                                 >
+
+                                                <HBox 
+                                                    width="100%"
+                                                    renderType="Bare"
+                                                >
+                                                    <core:Icon
+                                                        src="sap-icon://message-warning"
+                                                        color="#eb1504"
+                                                        class="announcementIconUnread sapUiTinyMarginEnd"
+                                                        visible="{= ${announcementsModel>announcementType} === 'Sidebar (Popup)' }"
+                                                        size="1.2rem"
+                                                    />
+                                                
                                                     <Text
                                                         text="{announcementsModel>title}"
-                                                        class="sapUiTinyMarginBottom announcementTextUnread"
+                                                        class="sapUiTinyMarginBottom announcementTextUnreadTitle"
                                                     />
+                                                </HBox>
                                                     <Text
                                                         text="{announcementsModel>date}"
                                                         class="sapUiTinyMarginBottom announcementTextUnread"
@@ -401,16 +464,16 @@
                                                         width="100%"
                                                         justifyContent="End"
                                                     >
-                                                        <Link
+                                                        <!-- <Link
                                                             text="{= ${announcementsModel>expanded} ? 'Read less' : 'Read more' }"
                                                             press=".onAnnouncementPress"
                                                             class="sapUiTinyMarginBottom sapUiMediumMarginEnd"
-                                                        />
+                                                        /> -->
                                                     </HBox>
                                                     <FormattedText
                                                         htmlText="{announcementsModel>description}"
                                                         visible="{announcementsModel>expanded}"
-                                                        class="announcementTextUnread"
+                                                        class="announcementTextUnread sapUiMediumMarginEnd"
                                                     />
                                                 </VBox>
                                             </HBox>

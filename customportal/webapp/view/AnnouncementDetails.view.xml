@@ -222,10 +222,22 @@
                                             width="100%"
                                             class="sapUiTinyMarginStart"
                                         >
+                                        <HBox  
+                                            width="100%"
+                                            renderType="Bare"
+                                        >
+                                            <core:Icon
+                                                src="sap-icon://message-warning"
+                                                color="#eb1504"
+                                                class="announcementIconUnread sapUiTinyMarginEnd"
+                                                visible="{= ${announcementDetailsModel>announcementType} === 'Sidebar (Popup)' }"
+                                                size="1.2rem"
+                                            />
                                             <Text
                                                 text="{announcementDetailsModel>title}"
-                                                class="sapUiTinyMarginBottom announcementTextUnread"
+                                                class="sapUiTinyMarginBottom announcementTextUnreadTitle"
                                             />
+                                        </HBox>
                                             <Text
                                                 text="{announcementDetailsModel>date}"
                                                 class="sapUiTinyMarginBottom announcementTextUnread"
@@ -247,16 +259,16 @@
                                                 width="100%"
                                                 justifyContent="End"
                                             >
-                                                <Link
+                                                <!-- <Link
                                                     text="{= ${announcementDetailsModel>expanded} ? 'Read less' : 'Read more' }"
                                                     press=".onAnnouncementItemPress"
                                                     class="sapUiTinyMarginBottom sapUiMediumMarginEnd"
-                                                />
+                                                /> -->
                                             </HBox>
                                             <FormattedText
                                                 htmlText="{announcementDetailsModel>description}"
                                                 visible="{announcementDetailsModel>expanded}"
-                                                class="announcementTextUnread"
+                                                class="announcementTextUnread sapUiSmallMarginEnd"
                                             />
                                         </VBox>
                                     </HBox>

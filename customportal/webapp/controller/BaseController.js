@@ -149,6 +149,18 @@ sap.ui.define([
                 that._hasAnnouncementType(item.announcementType, "Sidebar")
             );
 
+            var aUnreadAnnouncements = allAnnouncements.filter(item =>
+                !item.isRead
+            );
+
+            var aImportantAnnouncements = allAnnouncements.filter(item =>
+                that._hasAnnouncementType(item.announcementType, "Sidebar (Popup)")
+            );
+
+            oModel.setproperty("/sAllBtnTxt", "All (" + aAnnouncements.length() + ")");
+            oModel.setproperty("/sUnreadBtnTxt", "Unread (" + aUnreadAnnouncements.length() + ")");
+            oModel.setproperty("/sImportantBtnTxt", "Important (" + aImportantAnnouncements.length() + ")");
+
             aAnnouncements = aAnnouncements.map(item => {
                 const tags = (item.toTypes || [])
                     .map(typeObj => typeObj.type?.name || "")

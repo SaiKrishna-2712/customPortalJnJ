@@ -300,32 +300,23 @@ sap.ui.define([
                 const data = oModel.getProperty(oCtx.getPath());
                 if (!data) return;
 
-                const oMainHBox = oItem.getContent()[0];
-                const oContainerBox = oMainHBox.getItems()[1]; // content VBox
-                const oLineVBox = oMainHBox.getItems()[0].getItems()[0]; // vertical line
+                // Remove old classes
+                oItem.removeStyleClass("announcementItemRead");
+                oItem.removeStyleClass("announcementItemUnread");
 
-                // Update line styles
+                // Add new class
+                oItem.addStyleClass(
+                    data.isRead ? "announcementItemRead" : "announcementItemUnread"
+                );
+
+                // Update vertical line only
+                const oMainHBox = oItem.getContent()[0];
+                const oLineVBox = oMainHBox.getItems()[0].getItems()[0];
+
                 oLineVBox.removeStyleClass("lineBlue");
                 oLineVBox.removeStyleClass("lineLightGray");
                 oLineVBox.addStyleClass(data.isRead ? "lineLightGray" : "lineBlue");
-
-                // Recursive style application for nested elements
-                const applyStyle = ctrl => {
-                    if (!ctrl) return;
-                    ctrl.removeStyleClass("announcementTextUnread");
-                    ctrl.removeStyleClass("announcementTextRead");
-                    ctrl.addStyleClass(data.isRead ? "announcementTextRead" : "announcementTextUnread");
-
-                    if (ctrl.getItems && typeof ctrl.getItems === "function") {
-                        ctrl.getItems().forEach(applyStyle);
-                    }
-                };
-
-                if (oContainerBox && oContainerBox.getItems) {
-                    oContainerBox.getItems().forEach(applyStyle);
-                }
             });
-            oModel.setProperty("/showAnnouncementBusy", false);
         },
 
         onManageTopics: function () {
