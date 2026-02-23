@@ -149,7 +149,7 @@ sap.ui.define([
                 that._hasAnnouncementType(item.announcementType, "Sidebar")
             );
 
-            var aUnreadAnnouncements = allAnnouncements.filter(item =>
+            var aUnreadAnnouncements = allAnnouncements.filter(item => 
                 !item.isRead
             );
 
@@ -157,10 +157,28 @@ sap.ui.define([
                 that._hasAnnouncementType(item.announcementType, "Sidebar (Popup)")
             );
 
+            aAnnouncements = that.trnsfrmAncmntData(aAnnouncements, oModel, controller);
+            aUnreadAnnouncements = that.trnsfrmAncmntData(aUnreadAnnouncements, oModel, controller);
+            aImportantAnnouncements = that.trnsfrmAncmntData(aImportantAnnouncements, oModel, controller);
+
             oModel.setProperty("/sAllBtnTxt", "All (" + aAnnouncements.length + ")");
             oModel.setProperty("/sUnreadBtnTxt", "Unread (" + aUnreadAnnouncements.length + ")");
             oModel.setProperty("/sImportantBtnTxt", "Important (" + aImportantAnnouncements.length + ")");
 
+            oModel.setProperty("/announcements", aAnnouncements);
+            oModel.setProperty("/aAllAnnouncements", aAnnouncements);
+            oModel.setProperty("/aUnreadAnnouncements", aUnreadAnnouncements);
+            oModel.setProperty("/aImportantAnnouncements", aImportantAnnouncements);
+
+            setTimeout(() => {
+                controller._updateAnnouncementStyles();
+            }, 100);
+
+            console.log("Loaded " + aAnnouncements.length + " active Process announcements");
+        },
+
+        trnsfrmAncmntData: function (aAnnouncements, oModel, controller) {
+            var that = this;
             aAnnouncements = aAnnouncements.map(item => {
                 const tags = (item.toTypes || [])
                     .map(typeObj => typeObj.type?.name || "")
@@ -190,13 +208,7 @@ sap.ui.define([
                 return dateB - dateA;
             });
 
-            oModel.setProperty("/announcements", aAnnouncements);
-
-            setTimeout(() => {
-                controller._updateAnnouncementStyles();
-            }, 100);
-
-            console.log("Loaded " + aAnnouncements.length + " active Process announcements");
+            return aAnnouncements;
         },
 
         _updateAnnouncementReadStatus: function (announcementId) {

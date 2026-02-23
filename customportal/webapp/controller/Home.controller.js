@@ -1039,6 +1039,13 @@ sap.ui.define([
             }
             
             oModel.setProperty(sPath + "/expanded", bExpanded);
+            var aAllAnnouncements = oModel.getProperty("/aAllAnnouncements");
+            var aUnreadAnnouncements = announcements.filter(oItem => 
+                !oItem.isRead
+            );
+
+            oModel.setProperty("/aUnreadAnnouncements", aUnreadAnnouncements);
+            oModel.setProperty("/sUnreadBtnTxt", "Unread (" + aUnreadAnnouncements.length + ")");
 
             this._updateAnnouncementStyles();
         },
@@ -1093,21 +1100,36 @@ sap.ui.define([
         },
 
         onPressAllAnnouncement: function (oEvent) {
+            var oAnnouncementsModel = this.getView().getModel("announcementsModel");
+            var aAllAnnouncements = oAnnouncementsModel.getProperty("/aAllAnnouncements")
+            oAnnouncementsModel.setProperty("/announcements", aAllAnnouncements);
             this._setSelectedFilter(oEvent.getSource());
             console.log(oEvent);
         },
 
         onPressUnreadAnnouncement: function (oEvent) {
+            var oAnnouncementsModel = this.getView().getModel("announcementsModel");
+            var aAllAnnouncements = oAnnouncementsModel.getProperty("/aAllAnnouncements");
+
+            var aUnreadAnnouncements = aAllAnnouncements.filter(oItem => 
+                !oItem.isRead
+            );
+
+            oAnnouncementsModel.setProperty("/announcements", aUnreadAnnouncements);
             this._setSelectedFilter(oEvent.getSource());
             console.log(oEvent);
         },
 
         onPressImpAnnouncement: function (oEvent) {
+            var oAnnouncementsModel = this.getView().getModel("announcementsModel");
+            var aImportantAnnouncements = oAnnouncementsModel.getProperty("/aImportantAnnouncements")
+            oAnnouncementsModel.setProperty("/announcements", aImportantAnnouncements);
             this._setSelectedFilter(oEvent.getSource());
             console.log(oEvent);
         },
 
         _setSelectedFilter: function (oSelectedButton) {
+            this._updateAnnouncementStyles();
 
             var aButtons = this.byId("idMainPg")
                 .findAggregatedObjects(true, function (oControl) {
