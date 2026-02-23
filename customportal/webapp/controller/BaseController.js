@@ -157,9 +157,9 @@ sap.ui.define([
                 that._hasAnnouncementType(item.announcementType, "Sidebar (Popup)")
             );
 
-            oModel.setproperty("/sAllBtnTxt", "All (" + aAnnouncements.length + ")");
-            oModel.setproperty("/sUnreadBtnTxt", "Unread (" + aUnreadAnnouncements.length + ")");
-            oModel.setproperty("/sImportantBtnTxt", "Important (" + aImportantAnnouncements.length + ")");
+            oModel.setProperty("/sAllBtnTxt", "All (" + aAnnouncements.length + ")");
+            oModel.setProperty("/sUnreadBtnTxt", "Unread (" + aUnreadAnnouncements.length + ")");
+            oModel.setProperty("/sImportantBtnTxt", "Important (" + aImportantAnnouncements.length + ")");
 
             aAnnouncements = aAnnouncements.map(item => {
                 const tags = (item.toTypes || [])
