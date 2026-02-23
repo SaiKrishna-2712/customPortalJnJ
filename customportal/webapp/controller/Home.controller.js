@@ -444,6 +444,11 @@ sap.ui.define([
             var that = this;
             var oUserModel = this.getOwnerComponent().getModel("userModel");
             var oAnnouncementModel = this.getOwnerComponent().getModel("announcementModel");
+            var iUnReadAncmtCount = oAnnouncementModel.getProperty("/aUnreadAnnouncements")?.length;
+            if (iUnReadAncmtCount === 0) 
+            {   
+                return;
+            }
             // var userId = oUserModel.getProperty("/email");
             var userEmail = oUserModel.getProperty("/email");
 
@@ -467,12 +472,13 @@ sap.ui.define([
         updateIgnoredAnnouncements: function () {
             var that = this;
             var oProcessAnnouncementsModel = this.getView().getModel("announcementsModel");
-            var aProcessAnnouncements = oProcessAnnouncementsModel.getProperty("/announcements");
+            var aProcessAnnouncements = oProcessAnnouncementsModel.getProperty("/aAllAnnouncements");
 
-             aProcessAnnouncements.forEach(function (oItem) {
+            aProcessAnnouncements.forEach(function (oItem) {
                     oItem.isRead = true;
             });
-
+            var allReadButton = this.getView().byId("idAllAncmtBtn");
+            this.onPressAllAnnouncement(null, allReadButton)
             // Update model so UI refreshes
             oProcessAnnouncementsModel.setProperty("/announcements", aProcessAnnouncements);
             setTimeout(() => {
@@ -1097,54 +1103,7 @@ sap.ui.define([
         onViewAllArticles: function () {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             oRouter.navTo("RouteKnowledgeArticleDetails");
-        },
-
-        onPressAllAnnouncement: function (oEvent) {
-            var oAnnouncementsModel = this.getView().getModel("announcementsModel");
-            var aAllAnnouncements = oAnnouncementsModel.getProperty("/aAllAnnouncements")
-            oAnnouncementsModel.setProperty("/announcements", aAllAnnouncements);
-            this._setSelectedFilter(oEvent.getSource());
-            console.log(oEvent);
-        },
-
-        onPressUnreadAnnouncement: function (oEvent) {
-            var oAnnouncementsModel = this.getView().getModel("announcementsModel");
-            var aAllAnnouncements = oAnnouncementsModel.getProperty("/aAllAnnouncements");
-
-            var aUnreadAnnouncements = aAllAnnouncements.filter(oItem => 
-                !oItem.isRead
-            );
-
-            oAnnouncementsModel.setProperty("/announcements", aUnreadAnnouncements);
-            this._setSelectedFilter(oEvent.getSource());
-            console.log(oEvent);
-        },
-
-        onPressImpAnnouncement: function (oEvent) {
-            var oAnnouncementsModel = this.getView().getModel("announcementsModel");
-            var aImportantAnnouncements = oAnnouncementsModel.getProperty("/aImportantAnnouncements")
-            oAnnouncementsModel.setProperty("/announcements", aImportantAnnouncements);
-            this._setSelectedFilter(oEvent.getSource());
-            console.log(oEvent);
-        },
-
-        _setSelectedFilter: function (oSelectedButton) {
-            this._updateAnnouncementStyles();
-
-            var aButtons = this.byId("idMainPg")
-                .findAggregatedObjects(true, function (oControl) {
-                    return oControl.hasStyleClass && oControl.hasStyleClass("filterTabBtn");
-                });
-
-            aButtons.forEach(function (oBtn) {
-                oBtn.removeStyleClass("selectedTab");
-            });
-
-            oSelectedButton.addStyleClass("selectedTab");
-
-            oSelectedButton
-        }
-    
+        }    
 
     });
 })

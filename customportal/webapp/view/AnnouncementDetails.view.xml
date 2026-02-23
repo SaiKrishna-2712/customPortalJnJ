@@ -190,6 +190,27 @@
                             busyIndicatorDelay="0"
                             busy="{announcementDetailsModel>/showAnnouncementBusy}"
                         >
+                            <!-- Filter Tabs -->
+                            <HBox class="filterTabsBar" >
+                                <Button
+                                    text="{announcementDetailsModel>/sAllBtnTxt}"
+                                    press="onPressAllAnnouncement"
+                                    type="Transparent"
+                                    class="sapUiTinyMarginBeginEnd filterTabBtn selectedTab"
+                                />
+                                <Button
+                                    text="{announcementDetailsModel>/sUnreadBtnTxt}"
+                                    press="onPressUnreadAnnouncement"
+                                    type="Transparent"
+                                    class="sapUiTinyMarginBeginEnd filterTabBtn"
+                                />
+                                <Button
+                                    text="{announcementDetailsModel>/sImportantBtnTxt}"
+                                    press="onPressImpAnnouncement"
+                                    type="Transparent"
+                                    class="sapUiTinyMarginBeginEnd filterTabBtn"
+                                />
+                            </HBox>
                             <!-- Announcements List -->
                             <List
                                 id="idAnnouncementDetailsList"

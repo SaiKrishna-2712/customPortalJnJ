@@ -231,7 +231,58 @@ sap.ui.define([
                     console.log(oError);
                 }
             });
+        },
+
+        onPressAllAnnouncement: function (oEvent, selectedButton) {
+            var oSource = oEvent?.getSource() || selectedButton;
+            var oContext = oSource.getBinding("text");
+            var oAnnouncementsModel = oContext.getModel();
+            var aAllAnnouncements = oAnnouncementsModel.getProperty("/aAllAnnouncements")
+            oAnnouncementsModel.setProperty("/announcements", aAllAnnouncements);
+            this._setSelectedFilter(oSource);
+            console.log(oEvent);
+        },
+
+        onPressUnreadAnnouncement: function (oEvent) {
+            var oSource = oEvent?.getSource();
+            var oContext = oSource.getBinding("text");
+            var oAnnouncementsModel = oContext.getModel();
+            var aAllAnnouncements = oAnnouncementsModel.getProperty("/aAllAnnouncements");
+
+            var aUnreadAnnouncements = aAllAnnouncements.filter(oItem => 
+                !oItem.isRead
+            );
+
+            oAnnouncementsModel.setProperty("/announcements", aUnreadAnnouncements);
+            this._setSelectedFilter(oEvent.getSource());
+            console.log(oEvent);
+        },
+
+        onPressImpAnnouncement: function (oEvent) {
+            var oSource = oEvent?.getSource();
+            var oContext = oSource.getBinding("text");
+            var oAnnouncementsModel = oContext.getModel();
+            var aImportantAnnouncements = oAnnouncementsModel.getProperty("/aImportantAnnouncements")
+            oAnnouncementsModel.setProperty("/announcements", aImportantAnnouncements);
+            this._setSelectedFilter(oEvent.getSource());
+            console.log(oEvent);
+        },
+
+        _setSelectedFilter: function (oSelectedButton) {
+            this._updateAnnouncementStyles();
+
+            var aButtons = this.getView()
+                .findAggregatedObjects(true, function (oControl) {
+                    return oControl.hasStyleClass && oControl.hasStyleClass("filterTabBtn");
+                });
+
+            aButtons.forEach(function (oBtn) {
+                oBtn.removeStyleClass("selectedTab");
+            });
+
+            oSelectedButton.addStyleClass("selectedTab");
         }
+
 
     });
 })

@@ -342,6 +342,7 @@
                                 <!-- Filter Tabs -->
                                 <HBox class="filterTabsBar" >
                                     <Button
+                                        id="idAllAncmtBtn"
                                         text="{announcementsModel>/sAllBtnTxt}"
                                         press="onPressAllAnnouncement"
                                         type="Transparent"
