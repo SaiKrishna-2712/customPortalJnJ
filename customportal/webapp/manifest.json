@@ -97,6 +97,10 @@
       },
       "emergencyAnnouncementModel":{
         "type": "sap.ui.model.json.JSONModel"
+      },
+      "filterModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/filterModel.json"
       }
     },
     "resources": {

@@ -12,7 +12,7 @@ modules:
   - name: com-incture-customPortal-destination-service
     group: destinations
     properties:
-      forwardAuthToken: false
+      forwardAuthToken: true
       name: ui5
       url: https://ui5.sap.com
   - name: com-incture-customPortal-connectivity

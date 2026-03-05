@@ -33,6 +33,28 @@ sap.ui.define([
             this.getCurrentUserDetails(this);
 
             this.getOwnerComponent().getRouter().getRoute("RouteAnnouncementDetails").attachPatternMatched(this._onAnnouncementRouteMatched, this);
+            this.setFilterModel();
+        },
+
+        setFilterModel: function () {
+            var oFilterData = {
+                                "category": [
+                                    { "key": "General", "text": "General", "selected": false },
+                                    { "key": "Inventory Finance", "text": "Inventory Finance", "selected": false },
+                                    { "key": "Treasury", "text": "Treasury", "selected": false },
+                                    { "key": "R&D", "text": "R&D", "selected": false },
+                                    { "key": "Supply Chain", "text": "Supply Chain", "selected": false },
+                                    { "key": "Tax", "text": "Tax", "selected": false },
+                                    { "key": "Reporting", "text": "Reporting", "selected": false },
+                                    { "key": "I2C", "text": "I2C", "selected": false },
+                                    { "key": "P2P", "text": "P2P", "selected": false },
+                                    { "key": "A2R", "text": "A2R", "selected": false },
+                                    { "key": "Planning/Forecasting", "text": "Planning/Forecasting", "selected": false }
+                                ]
+                            };
+            var oFilterModel = new JSONModel();
+            oFilterModel.setData(oFilterData);
+            this.getView().setModel(oFilterModel, "filterModel");
 
         },
 
@@ -196,51 +218,45 @@ sap.ui.define([
             }
         },
 
-        onTopicFilterChange: function () {
-            var oFilterModel = this.getView().getModel("filterModel");
-            var oList = this.byId("idAnnouncementDetailsList");
-            var aFilters = [];
+        onTopicFilterChange: function (oEvent) {
 
-            // Get filter states
-            var bGeneral = oFilterModel.getProperty("/general");
-            var bReporting = oFilterModel.getProperty("/reporting");
-            var bPlanning = oFilterModel.getProperty("/planning");
-            var bA2R = oFilterModel.getProperty("/a2r");
+            const oView = this.getView();
+            const oFilterModel = oView.getModel("filterModel");
+            const oAnnouncementModel = oView.getModel("announcementDetailsModel");
 
-            // Build array of selected topics
-            var aSelectedTopics = [];
-            if (bGeneral) aSelectedTopics.push("General");
-            if (bReporting) aSelectedTopics.push("Reporting");
-            if (bPlanning) {
-                aSelectedTopics.push("Planning");
-                aSelectedTopics.push("Forecasting");
-            }
-            if (bA2R) aSelectedTopics.push("A2R");
+            const aCategories = oFilterModel.getProperty("/category");
 
-            // If any filters are selected, create custom filter
-            if (aSelectedTopics.length > 0) {
-                var oFilter = new Filter({
-                    path: "tags",
-                    test: function (aTags) {
-                        if (!aTags || !Array.isArray(aTags)) {
-                            return false;
-                        }
-                        // Check if any tag matches any selected topic
-                        return aTags.some(function (tag) {
-                            return aSelectedTopics.some(function (topic) {
-                                return tag.indexOf(topic) !== -1;
-                            });
-                        });
-                    }
+            // Get selected filter keys
+            const aSelectedCategories = aCategories
+                .filter(cat => cat.selected)
+                .map(cat => cat.key);
+
+            const aAllAnnouncements = oAnnouncementModel.getProperty("/aAllAnnouncements");
+
+            let aFiltered = [];
+
+            if (aSelectedCategories.length === 0) {
+                // If no filter selected → show all
+                aFiltered = aAllAnnouncements;
+            } else {
+                aFiltered = aAllAnnouncements.filter(item => {
+
+                    if (!item.category) return false;
+
+                    // Convert "A2R,P2P,Reporting" → ["A2R","P2P","Reporting"]
+                    const itemCategories = item.category;
+
+                    // Check if ANY selected category matches
+                    return itemCategories.some(cat =>
+                        aSelectedCategories.includes(cat)
+                    );
                 });
-                aFilters.push(oFilter);
             }
-
-            // Apply filters to the list
-            var oBinding = oList.getBinding("items");
-            if (oBinding) {
-                oBinding.filter(aFilters);
-            }
+            oAnnouncementModel.setProperty("/announcements", aFiltered);
+            
+            setTimeout(() => {
+                this._updateAnnouncementStyles();
+            }, 100);        
         },
 
         onResetFilters: function () {
@@ -412,24 +428,6 @@ sap.ui.define([
                 
                 success: function (oData) {
                     var allAnnouncements = oData.results || [];
-
-                    // Transform the OData response to match expected format
-                    allAnnouncements = allAnnouncements.map(function (item) {
-                        return {
-                            announcementId: item.announcementId,
-                            title: item.title,
-                            description: item.description,
-                            announcementType: item.announcementType,
-                            isRead: item.isRead,
-                            isActive: item.isActive,
-                            startAnnouncement: item.startAnnouncement,
-                            endAnnouncement: item.endAnnouncement,
-                            publishedBy: item.publishedBy,
-                            publishedAt: item.publishedAt,
-                            announcementStatus: item.announcementStatus,
-                            toTypes: item.toTypes ? item.toTypes.results || item.toTypes : []
-                        };
-                    });
 
                     that._processProcessAnnouncements(allAnnouncements, oAnnouncementDetailsModel, that);
                 },

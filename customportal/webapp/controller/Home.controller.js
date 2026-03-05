@@ -24,79 +24,70 @@ sap.ui.define([
             // Tiles data - Added more tiles for testing scroll functionality
             var oTilesData = {
                 tiles: [
-                    {
-                        ID: "1",
-                        title: "Google",
-                        subtitle: "Search Engine",
-                        url: "https://www.google.com",
-                        icon: "sap-icon://world",
-                        embedMode: "newtab",
-                        active: true
-                    },
-                    {
-                        ID: "2",
-                        title: "SAP",
-                        subtitle: "SAP Official",
-                        url: "https://www.sap.com",
-                        icon: "sap-icon://hint",
-                        embedMode: "iframe",
-                        active: true
-                    },
-                    {
-                        ID: "3",
-                        title: "Topas Cherrywork",
-                        subtitle: "Timesheet",
-                        url: "https://topas.cherrywork.com/home/dashboard",
-                        icon: "sap-icon://employee",
-                        embedMode: "newtab",
-                        active: true
-                    },
-                    {
-                        ID: "4",
-                        title: "Microsoft",
-                        subtitle: "Productivity Suite",
-                        url: "https://www.microsoft.com",
-                        icon: "sap-icon://collaborate",
-                        embedMode: "newtab",
-                        active: true
-                    },
-                    {
-                        ID: "5",
-                        title: "Analytics",
-                        subtitle: "Data Insights",
-                        url: "https://www.analytics.com",
-                        icon: "sap-icon://business-objects-experience",
-                        embedMode: "newtab",
-                        active: true
-                    },
-                    {
-                        ID: "6",
-                        title: "CRM System",
-                        subtitle: "Customer Management",
-                        url: "https://www.crm.com",
-                        icon: "sap-icon://customer",
-                        embedMode: "iframe",
-                        active: true
-                    },
-                    {
-                        ID: "7",
-                        title: "Knowledge Base",
-                        subtitle: "Documentation",
-                        url: "https://www.kb.com",
-                        icon: "sap-icon://database",
-                        embedMode: "newtab",
-                        active: true
-                    },
-                    {
-                        ID: "8",
-                        title: "Project Manager",
-                        subtitle: "Task Management",
-                        url: "https://www.projectmanager.com",
-                        icon: "sap-icon://task",
-                        embedMode: "newtab",
-                        active: true
-                    },
-                ]
+                        {
+                            ID: "1",
+                            title: "Sales Order Report",
+                            subtitle: "Sales Analytics & Reporting",
+                            url: "https://www.google.com",
+                            icon: "sap-icon://world",
+                            embedMode: "newtab",
+                            active: true
+                        },
+                        {
+                            ID: "2",
+                            title: "IC Sales View",
+                            subtitle: "Intercompany Sales Monitoring",
+                            url: "https://jnj-cbb-dev.workzone.cfapps.us10.hana.ondemand.com/site?sap-app-origin-hint=#Launchpad-openFLPPage?pageId=f4e19e42-6c6f-4c4a-bba5-6fe6bb480b23&spaceId=b7f50042-3656-4965-9cec-b6a5c13d45ad",
+                            icon: "sap-icon://hint",
+                            embedMode: "newtab",
+                            active: true
+                        },
+                        {
+                            ID: "3",
+                            title: "Currency Ledger",
+                            subtitle: "Financial Ledger & FX Tracking",
+                            url: "https://topas.cherrywork.com/home/dashboard",
+                            icon: "sap-icon://employee",
+                            embedMode: "newtab",
+                            active: true
+                        },
+                        {
+                            ID: "4",
+                            title: "Workflow Management",
+                            subtitle: "Process & Approval Automation",
+                            url: "https://www.microsoft.com",
+                            icon: "sap-icon://collaborate",
+                            embedMode: "newtab",
+                            active: true
+                        },
+                        {
+                            ID: "6",
+                            title: "CRM System",
+                            subtitle: "Customer Relationship Management",
+                            url: "https://www.crm.com",
+                            icon: "sap-icon://customer",
+                            embedMode: "iframe",
+                            active: true
+                        },
+                        {
+                            ID: "7",
+                            title: "Sales Order Creation",
+                            subtitle: "Order Processing & Documentation",
+                            url: "https://www.kb.com",
+                            icon: "sap-icon://database",
+                            embedMode: "newtab",
+                            active: true
+                        },
+                        {
+                            ID: "8",
+                            title: "Invoice Approval",
+                            subtitle: "Accounts Payable Workflow",
+                            url: "https://jnj-cbb-dev.workzone.cfapps.us10.hana.ondemand.com/site#otbcwuipf07bcvimgui-displayApprovalWorkplace?sap-app-origin-hint=&sap-ui-app-id-hint=e8eda59b-cb8d-406c-8f50-7f196133b0b2%22",
+                            icon: "sap-icon://my-sales-order",
+                            embedMode: "newtab",
+                            active: true
+                        }
+                    ]
             };
             this.getOwnerComponent().getModel("tilesModel").setData(oTilesData);
             

@@ -142,33 +142,22 @@
                             </HBox>
 
                             <!-- Topic Filters -->
-                            <VBox class="sapUiSmallMarginTop">
-                                <CheckBox
-                                    text="General"
-                                    selected="{filterModel>/general}"
-                                    select=".onTopicFilterChange"
-                                    class="sapUiSmallMarginBottom"
-                                />
-                                <CheckBox
-                                    text="Reporting"
-                                    selected="{filterModel>/reporting}"
-                                    select=".onTopicFilterChange"
-                                    class="sapUiSmallMarginBottom"
-                                />
-                                <CheckBox
-                                    text="Planning / Forecasting"
-                                    selected="{filterModel>/planning}"
-                                    select=".onTopicFilterChange"
-                                    class="sapUiSmallMarginBottom"
-                                />
-                                <CheckBox
-                                    text="A2R"
-                                    selected="{filterModel>/a2r}"
-                                    select=".onTopicFilterChange"
-                                    class="sapUiSmallMarginBottom"
-                                />
+                            <VBox
+                                class="sapUiSmallMarginTop"
+                                items="{
+                                    path: 'filterModel>/category'
+                                }"
+                            >
+                                <items>
+                                    <CheckBox
+                                        text="{filterModel>text}"
+                                        selected="{filterModel>selected}"
+                                        select=".onTopicFilterChange"
+                                        class="sapUiSmallMarginBottom"
+                                    />
+                                </items>
                             </VBox>
-
+                            
                             <!-- Manage Topics Link -->
                             <Link
                                 text="Manage My Topics"

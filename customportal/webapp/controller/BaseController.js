@@ -180,24 +180,22 @@ sap.ui.define([
         trnsfrmAncmntData: function (aAnnouncements, oModel, controller) {
             var that = this;
             aAnnouncements = aAnnouncements.map(item => {
-                const tags = (item.toTypes || [])
-                    .map(typeObj => typeObj.type?.name || "")
-                    .filter(name => name !== "");
-
+                
                 return {
                     announcementId: item.announcementId,
                     title: item.title || "No Title",
                     description: item.description || "",
                     htmlDescription: that._parseRichText(item.description), // UPDATED: Store original HTML
                     date: that.formatter.timeAgo(item.startAnnouncement),
-                    tags: tags,
+                    tags: (controller.transformCategory(item.category || [])),
                     announcementType: item.announcementType || "",
                     isRead: item.isRead || false,
                     expanded: false,
                     previousExpanded: false,
                     startDate: item.startAnnouncement,
                     endDate: item.endAnnouncement,
-                    isActive: item.isActive
+                    isActive: item.isActive,
+                    category: controller.transformCategory(item.category)
                 };
             });
 
@@ -209,6 +207,16 @@ sap.ui.define([
             });
 
             return aAnnouncements;
+        },
+
+        transformCategory: function (category) {
+            if(!category || category == "" || category == []){
+                category = "General"
+            }
+            var aCategories = category.split(",").map(cat => cat.trim());
+
+            return aCategories;
+
         },
 
         _updateAnnouncementReadStatus: function (announcementId) {
